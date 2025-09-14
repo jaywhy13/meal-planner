@@ -1,0 +1,1 @@
+Change the app so that we're not using a calendar. Use a 4-week plan. The meal plan should have 4 weeks, 5 days each week. Additionally, provide an area where we can disable different meals displayed in the app. For e.g., I want to disable snack so it doesn't show at all.

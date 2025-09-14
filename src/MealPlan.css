@@ -1,0 +1,46 @@
+.meal-plan {
+  background-color: white;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.meal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.meal-table th,
+.meal-table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.meal-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.day-name {
+  font-weight: bold;
+  background-color: #f9f9f9;
+}
+
+.meal-slot {
+  min-height: 50px;
+  background-color: #f0f8ff;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.meal-slot:hover {
+  background-color: #e0f0ff;
+}
+
+tr:nth-child(even) {
+  background-color: #fafafa;
+}
