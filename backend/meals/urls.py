@@ -10,5 +10,5 @@ router.register(r'meal-suggestions', MealSuggestionViewSet)
 router.register(r'meal-settings', MealSettingsViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]
