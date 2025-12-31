@@ -1,27 +1,58 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# dependencies
-**/node_modules/
-/.pnp
-.pnp.js
+# Virtual environments
+venv/
+env/
+ENV/
 
-# testing
-/coverage
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# production
-/build
-
-# misc
+# OS
 .DS_Store
+Thumbs.db
+
+# Database
+db.sqlite3
+
+# Logs
+*.log
+
+# Node modules
+node_modules/
+
+# React build (will be generated)
+frontend/build/
+
+# Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-
-*.sqlite
-**/venv/
+# Heroku
+.heroku/
