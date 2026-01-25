@@ -14,6 +14,35 @@ from pathlib import Path
 import os
 from decouple import config
 
+class RequestLoggingMiddleware:
+    """Middleware to log all incoming requests for debugging."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Log request details
+        print(f"=== Incoming Request ===")
+        print(f"Method: {request.method}")
+        print(f"Path: {request.path}")
+        print(f"Full Path: {request.get_full_path()}")
+        print(f"Host: {request.get_host()}")
+        print(f"Scheme: {request.scheme}")
+        print(f"META: {dict(request.META)}")
+
+        # Process the request
+        response = self.get_response(request)
+
+        # Log response details
+        print(f"=== Response ===")
+        print(f"Status: {response.status_code}")
+        if hasattr(response, "url"):
+            print(f"Redirect URL: {response.url}")
+        print(f"========================")
+
+        return response
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
