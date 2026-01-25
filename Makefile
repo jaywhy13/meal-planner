@@ -1,6 +1,29 @@
 build:
 	docker build -f backend/Dockerfile-lambda --no-cache  --platform linux/x86_64 -t meal-planner backend/
 	docker tag meal-planner:latest 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest
+
+build-local:
+	docker build -f backend/Dockerfile-lambda --no-cache -t meal-planner-local backend/
+
+
+push:
+	docker push 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest  
+
+build-and-push: build push
+
+run:
+	docker run -p 9000:8080 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest
+
+runserver:
+	docker run -p 8080:8000 -it --entrypoint python meal-planner-local manage.py runserver 0.0.0.0:8000
+
+run-local:
+	docker run -p 9000:8080 meal-planner-local
+
+
+ssh:
+	docker run -it -v $(PWD)/backend:/var/task --entrypoint sh meal-planner-local 
+
 test:
 	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
 
