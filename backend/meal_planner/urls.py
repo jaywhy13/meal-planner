@@ -21,10 +21,10 @@ from django.conf.urls.static import static
 from meals.views_frontend import index, health_check
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('meals.urls')),
-    path('health/', health_check, name='health_check'),
-    path('', index, name='index'),
+    path("admin/", admin.site.urls),
+    path("api/", include("meals.urls")),
+    path("health", health_check, name="health_check"),
+    path("", index, name="index"),
 ]
 
 # Serve static files in development
