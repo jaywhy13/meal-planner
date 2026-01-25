@@ -1,7 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
 from .views import (
     DailyMealViewSet,
     FoodViewSet,
@@ -10,6 +9,7 @@ from .views import (
     MealSuggestionViewSet,
 )
 
+router = DefaultRouter(trailing_slash=False)
 router.register(r"meal-plans", MealPlanViewSet)
 router.register(r"foods", FoodViewSet)
 router.register(r"daily-meals", DailyMealViewSet)
