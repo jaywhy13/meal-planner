@@ -19,11 +19,28 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from meals.views_frontend import index, health_check
+from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import include, path
+from meals.views_frontend import health_check, index
+
+
+def hello_world(request):
+    """Simple JSON hello world view."""
+    return JsonResponse({"message": "hello world"})
+
+
+def custom_404(request, exception):
+    """Custom 404 page handler."""
+    return JsonResponse({"error": "Couldn't find your page"}, status=404)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("meals.urls")),
     path("health", health_check, name="health_check"),
+    path("hello/", hello_world, name="hello_world"),
+    path("other_hello", hello_world, name="other_hello_world"),
     path("", index, name="index"),
 ]
 
