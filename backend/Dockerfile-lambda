@@ -1,0 +1,20 @@
+# Use the official AWS Lambda Python base image
+FROM public.ecr.aws/lambda/python:3.12
+
+# Set working directory
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy function code
+COPY . ${LAMBDA_TASK_ROOT}
+
+# Set Python path to include the current directory
+ENV PYTHONPATH="${LAMBDA_TASK_ROOT}:${PYTHONPATH}"
+
+# Set the CMD to your handler
+CMD ["lambda_handler.handler"]
