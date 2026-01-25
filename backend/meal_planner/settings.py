@@ -10,9 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
+import logging
 import os
+from pathlib import Path
+
 from decouple import config
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 
 class RequestLoggingMiddleware:
     """Middleware to log all incoming requests for debugging."""
