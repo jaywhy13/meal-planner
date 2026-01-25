@@ -14,11 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+
 from django.conf import settings
 from django.conf.urls.static import static
-from meals.views_frontend import index, health_check
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
@@ -43,6 +41,9 @@ urlpatterns = [
     path("other_hello", hello_world, name="other_hello_world"),
     path("", index, name="index"),
 ]
+
+# Custom error handlers
+handler404 = "meal_planner.urls.custom_404"
 
 # Serve static files in development
 if settings.DEBUG:
