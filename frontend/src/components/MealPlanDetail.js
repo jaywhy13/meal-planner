@@ -73,7 +73,15 @@ const MealPlanDetail = () => {
     'Other',
   ];
 
-  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayNames = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
   useEffect(() => {
     if (id) {
@@ -311,9 +319,9 @@ const MealPlanDetail = () => {
             </Typography>
             
             <Grid container spacing={2}>
-              {[1, 2, 3, 4, 5].map(day => (
-                <Grid item xs={12} sm={6} md={2.4} key={day}>
-                  <Card variant="outlined" sx={{ height: '100%' }}>
+              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                <Grid item xs={12} sm={6} md={1.71} key={day}>
+                  <Card variant="outlined" sx={{ height: "100%" }}>
                     <CardContent sx={{ p: 2 }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                         {dayNames[day - 1]}
@@ -402,8 +410,10 @@ const MealPlanDetail = () => {
                 onChange={(e) => setSelectedDay(e.target.value)}
                 label="Day"
               >
-                {[1, 2, 3, 4, 5].map(day => (
-                  <MenuItem key={day} value={day}>{dayNames[day - 1]}</MenuItem>
+                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                  <MenuItem key={day} value={day}>
+                    {dayNames[day - 1]}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
