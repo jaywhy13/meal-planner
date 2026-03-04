@@ -1,71 +1,32 @@
-build:
+lambda-build:
 	docker build -f backend/Dockerfile-lambda --no-cache  --platform linux/x86_64 -t meal-planner backend/
 	docker tag meal-planner:latest 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest
 
-build-local:
+lambda-build-local:
 	docker build -f backend/Dockerfile-lambda --no-cache -t meal-planner-local backend/
 
-
-push:
+lambda-push:
 	docker push 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest  
 
-build-and-push: build push
 
-run:
+lambda-run:
 	docker run -p 9000:8080 879100528238.dkr.ecr.us-east-1.amazonaws.com/meal-planner:latest
 
-runserver:
-	docker run -p 8080:8000 -it --entrypoint python meal-planner-local manage.py runserver 0.0.0.0:8000
-
-run-local:
+lambda-run-local:
 	docker run -p 9000:8080 meal-planner-local
 
-
-ssh:
+lambda-ssh:
 	docker run -it -v $(PWD)/backend:/var/task --entrypoint sh meal-planner-local 
 
-test:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+init:
+	touch backend/.env frontend/.env
+	docker-compose build
 
-test-get:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"resource": "/api/", "path": "/api/", "httpMethod": "GET", "headers": {"Content-Type": "application/json"}, "multiValueHeaders": {}, "queryStringParameters": null, "multiValueQueryStringParameters": null, "pathParameters": null, "stageVariables": null, "requestContext": {"resourcePath": "/api/", "httpMethod": "GET", "path": "/api/", "accountId": "123456789012", "stage": "test", "requestId": "test-invoke-request", "identity": {"sourceIp": "127.0.0.1"}, "domainName": "test.execute-api.us-east-1.amazonaws.com", "apiId": "test123"}, "body": null, "isBase64Encoded": false}' \
-		| jq '.'
+start:
+	docker-compose up --watch
 
-test-get-v2:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "GET /api/", "rawPath": "/api/", "rawQueryString": "", "headers": {"content-type": "application/json"}, "requestContext": {"accountId": "123456789012", "apiId": "test123", "domainName": "test.execute-api.us-east-1.amazonaws.com", "domainPrefix": "test123", "http": {"method": "GET", "path": "/api/", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "curl"}, "requestId": "test-invoke-request", "routeKey": "GET /api/", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
+stop:
+	docker-compose down
 
-test-get-function-url:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "$default", "rawPath": "/api/", "rawQueryString": "", "headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", "accept-encoding": "gzip, deflate, br, zstd", "accept-language": "en-CA,en;q=0.9", "cache-control": "max-age=0", "host": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none", "sec-fetch-user": "?1", "upgrade-insecure-requests": "1", "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36", "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand)\";v=\"24\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"macOS\""}, "requestContext": {"accountId": "anonymous", "apiId": "qbonyismza6nyyp4mqxo5424ji0jhima", "domainName": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "domainPrefix": "qbonyismza6nyyp4mqxo5424ji0jhima", "http": {"method": "GET", "path": "/api/", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}, "requestId": "test-invoke-request", "routeKey": "$default", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
-
-test-hello:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "$default", "rawPath": "/hello/", "rawQueryString": "", "headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", "accept-encoding": "gzip, deflate, br, zstd", "accept-language": "en-CA,en;q=0.9", "cache-control": "max-age=0", "host": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none", "sec-fetch-user": "?1", "upgrade-insecure-requests": "1", "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36", "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand)\";v=\"24\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"macOS\""}, "requestContext": {"accountId": "anonymous", "apiId": "qbonyismza6nyyp4mqxo5424ji0jhima", "domainName": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "domainPrefix": "qbonyismza6nyyp4mqxo5424ji0jhima", "http": {"method": "GET", "path": "/hello/", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}, "requestId": "test-invoke-request", "routeKey": "$default", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
-
-test-hello-without-slash:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "$default", "rawPath": "/hello", "rawQueryString": "", "headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", "accept-encoding": "gzip, deflate, br, zstd", "accept-language": "en-CA,en;q=0.9", "cache-control": "max-age=0", "host": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none", "sec-fetch-user": "?1", "upgrade-insecure-requests": "1", "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36", "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand)\";v=\"24\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"macOS\""}, "requestContext": {"accountId": "anonymous", "apiId": "qbonyismza6nyyp4mqxo5424ji0jhima", "domainName": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "domainPrefix": "qbonyismza6nyyp4mqxo5424ji0jhima", "http": {"method": "GET", "path": "/hello", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}, "requestId": "test-invoke-request", "routeKey": "$default", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
-
-test-api-without-slash:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "$default", "rawPath": "/api", "rawQueryString": "", "headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", "accept-encoding": "gzip, deflate, br, zstd", "accept-language": "en-CA,en;q=0.9", "cache-control": "max-age=0", "host": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none", "sec-fetch-user": "?1", "upgrade-insecure-requests": "1", "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36", "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand)\";v=\"24\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"macOS\""}, "requestContext": {"accountId": "anonymous", "apiId": "qbonyismza6nyyp4mqxo5424ji0jhima", "domainName": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "domainPrefix": "qbonyismza6nyyp4mqxo5424ji0jhima", "http": {"method": "GET", "path": "/api", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}, "requestId": "test-invoke-request", "routeKey": "$default", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
-
-test-meal-plan-without-slash:
-	curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" \
-		-H "Content-Type: application/json" \
-		-d '{"version": "2.0", "routeKey": "$default", "rawPath": "/api/meal-plans", "rawQueryString": "", "headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7", "accept-encoding": "gzip, deflate, br, zstd", "accept-language": "en-CA,en;q=0.9", "cache-control": "max-age=0", "host": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "none", "sec-fetch-user": "?1", "upgrade-insecure-requests": "1", "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36", "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand)\";v=\"24\"", "sec-ch-ua-mobile": "?0", "sec-ch-ua-platform": "\"macOS\""}, "requestContext": {"accountId": "anonymous", "apiId": "qbonyismza6nyyp4mqxo5424ji0jhima", "domainName": "qbonyismza6nyyp4mqxo5424ji0jhima.lambda-url.us-east-1.on.aws", "domainPrefix": "qbonyismza6nyyp4mqxo5424ji0jhima", "http": {"method": "GET", "path": "/api/meal-plans", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1", "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"}, "requestId": "test-invoke-request", "routeKey": "$default", "stage": "$default", "time": "06/Jan/2026:00:00:00 +0000", "timeEpoch": 1736121600000}, "isBase64Encoded": false}' \
-		| jq '.'
-
+ssh:
+	docker-compose exec backend bash
