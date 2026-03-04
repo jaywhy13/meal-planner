@@ -9,7 +9,9 @@ COPY package*.json ./
 RUN yarn install
 
 # Copy the application code
-COPY . .
+COPY --chown=node:node . .
+
+USER node
 
 EXPOSE 3000
 
