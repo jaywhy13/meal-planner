@@ -13,10 +13,18 @@ services:
   frontend:
     build: ./frontend
     command: yarn run start
-    volumes:
-      - ./frontend:/app
     ports:
       - "3000:3000"
     env_file:
       - ./frontend/.env
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - build/
+        - action: rebuild
+          path: ./frontend/package.json
