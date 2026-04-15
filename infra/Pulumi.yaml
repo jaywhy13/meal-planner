@@ -1,0 +1,7 @@
+name: meal-planner
+description: Meal planner AWS infrastructure
+runtime:
+  name: python
+  options:
+    toolchain: uv
+    virtualenv: .venv

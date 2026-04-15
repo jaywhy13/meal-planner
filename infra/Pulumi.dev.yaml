@@ -1,0 +1,7 @@
+encryptionsalt: v1:i22ZHwWpwr0=:v1:2sqcD6Wz8I92zAAJ:Puhq0i3sBLWdQtAMdRmeYmmTNVhZmw==
+config:
+  meal-planner:vpc_id: vpc-52d59c37
+  meal-planner:subnet_id: subnet-74f4565f
+  meal-planner:aws_account_id: "879100528238"
+  meal-planner:aws_region: us-east-1
+  aws:region: us-east-1
