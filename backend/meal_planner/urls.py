@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import include, path
+from django.urls import include, path, re_path
 from meals.views_frontend import health_check, index
 
 
@@ -40,6 +40,10 @@ urlpatterns = [
     path("hello/", hello_world, name="hello_world"),
     path("other_hello", hello_world, name="other_hello_world"),
     path("", index, name="index"),
+    # Catch-all: serve the React app for any path not matched above.
+    # This allows React Router to handle client-side routes like /meal-plan/3
+    # directly. Must be last so it doesn't swallow API or admin routes.
+    re_path(r"^.*$", index, name="index_catchall"),
 ]
 
 # Custom error handlers
