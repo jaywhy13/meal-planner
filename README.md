@@ -127,6 +127,52 @@ The frontend will be available at `http://localhost:3000`
 - **DailyMeal**: Meals for specific dates and meal types
 - **MealSuggestion**: Pre-defined healthy meal combinations
 
+## Deployment (CI/CD)
+
+The app deploys to AWS Lambda via Pulumi. Two GitHub Actions workflows handle this automatically:
+
+- **Deploy** (`.github/workflows/deploy.yml`): Runs `pulumi up` on every push to `main` and on manual trigger
+- **Preview** (`.github/workflows/preview.yml`): Runs `pulumi preview` on pull requests and posts the diff as a PR comment
+
+### One-Time Setup
+
+1. **Migrate Pulumi state to Pulumi Cloud** (required for CI):
+   ```bash
+   cd infra
+   pulumi login
+   pulumi stack export --file state.json
+   pulumi stack import --file state.json
+   ```
+
+2. **Add GitHub repository secrets** (Settings → Secrets and variables → Actions):
+   - `PULUMI_ACCESS_TOKEN` — from [app.pulumi.com](https://app.pulumi.com) → Profile → Access Tokens
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `PULUMI_CONFIG_PASSPHRASE` — set to empty string if unused
+
+### Manual Deploy
+
+```bash
+cd infra
+pulumi up --stack dev
+```
+
+### Running Management Commands on Lambda
+
+To run Django management commands (e.g. after a fresh deploy):
+
+```bash
+aws lambda invoke \
+  --function-name meal-planner \
+  --payload '{"management_command": "migrate"}' \
+  response.json && cat response.json
+
+aws lambda invoke \
+  --function-name meal-planner \
+  --payload '{"management_command": "populate_data"}' \
+  response.json && cat response.json
+```
+
 ## Development
 
 To add new features:
