@@ -34,8 +34,6 @@ const MEAL_TYPES = [
   { value: 'snack', label: 'Snack' },
 ];
 
-const TOTAL_WEEKS = 4;
-
 const MealPlanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -67,6 +65,11 @@ const MealPlanDetail = () => {
     if (mealPlan) {
       fetchDailyMeals();
       fetchMealSettings();
+      // Open on the week containing today, so users land on what's current
+      // instead of always starting at Week 1 of the plan's anchor date.
+      const planMonday = dayjs(mealPlan.created_at).startOf('week').add(1, 'day');
+      const daysSinceStart = dayjs().startOf('day').diff(planMonday, 'day');
+      setCurrentWeek(Math.max(1, Math.floor(daysSinceStart / 7) + 1));
     }
   }, [mealPlan]);
 
@@ -111,7 +114,8 @@ const MealPlanDetail = () => {
   // Anchor Week 1 to the Monday of the week the plan was created.
   // dayjs treats Sunday as the start of the week, so we shift +1 day.
   const anchor = mealPlan ? dayjs(mealPlan.created_at) : dayjs();
-  const weekStart = anchor.startOf('week').add(1, 'day').add((currentWeek - 1) * 7, 'day');
+  const week1Start = anchor.startOf('week').add(1, 'day');
+  const weekStart = week1Start.add((currentWeek - 1) * 7, 'day');
   const weekEnd = weekStart.add(6, 'day');
   const rangeLabel = `${weekStart.format('MMM D')} – ${weekEnd.format('MMM D, YYYY')}`;
 
@@ -297,9 +301,9 @@ const MealPlanDetail = () => {
       <DateRangeBar
         label={rangeLabel}
         onPrev={() => setCurrentWeek((w) => Math.max(1, w - 1))}
-        onNext={() => setCurrentWeek((w) => Math.min(TOTAL_WEEKS, w + 1))}
+        onNext={() => setCurrentWeek((w) => w + 1)}
         canPrev={currentWeek > 1}
-        canNext={currentWeek < TOTAL_WEEKS}
+        canNext
       />
 
       <WeekGrid
