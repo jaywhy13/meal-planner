@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
+  Box,
   Typography,
-  Card,
-  CardContent,
-  CardActions,
   Button,
   Grid,
-  Box,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -16,9 +12,11 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Add, Edit, Delete, CalendarToday } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { mealPlansAPI } from '../services/api';
+import { semantic, shadows } from '../theme/tokens';
+import DashboardEmptyState from './dashboard/DashboardEmptyState';
+import MealPlanCard from './dashboard/MealPlanCard';
 
 const MealPlansList = () => {
   const [mealPlans, setMealPlans] = useState([]);
@@ -40,7 +38,7 @@ const MealPlansList = () => {
       setError(null);
     } catch (err) {
       if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
-        setError('Cannot connect to backend. Please make sure the backend is running on port 8000. Try running: docker-compose up --build');
+        setError('Cannot connect to backend. Please make sure the backend is running on port 8000.');
       } else {
         setError('Failed to fetch meal plans: ' + (err.response?.data?.detail || err.message));
       }
@@ -64,105 +62,79 @@ const MealPlansList = () => {
     }
   };
 
-  const handleDeleteMealPlan = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this meal plan?')) return;
-
+  const handleDeleteMealPlan = async (plan) => {
+    if (!window.confirm(`Delete "${plan.name}"? This cannot be undone.`)) return;
     try {
-      await mealPlansAPI.delete(id);
-      setMealPlans(mealPlans.filter(plan => plan.id !== id));
+      await mealPlansAPI.delete(plan.id);
+      setMealPlans(mealPlans.filter((p) => p.id !== plan.id));
     } catch (err) {
       setError('Failed to delete meal plan');
       console.error('Error deleting meal plan:', err);
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   if (loading) {
     return (
-      <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
+    <Box sx={{ px: { xs: 3, md: 5 }, py: { xs: 3, md: 4 }, minHeight: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 4,
+        }}
+      >
+        <Typography variant="h1" sx={{ color: semantic.textPrimary }}>
           Meal Plans
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenDialog(true)}
-        >
-          New Meal Plan
-        </Button>
+        {mealPlans.length > 0 && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenDialog(true)}
+            sx={{
+              px: 3,
+              py: 1.25,
+              fontSize: 14,
+              boxShadow: shadows.buttonGlow,
+              '&:hover': { boxShadow: shadows.buttonGlow },
+            }}
+          >
+            + New Plan
+          </Button>
+        )}
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {mealPlans.map((mealPlan) => (
-          <Grid item xs={12} sm={6} md={4} key={mealPlan.id}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {mealPlan.name}
-                </Typography>
-                <Typography color="text.secondary" variant="body2">
-                  Created: {formatDate(mealPlan.created_at)}
-                </Typography>
-                <Typography color="text.secondary" variant="body2">
-                  Updated: {formatDate(mealPlan.updated_at)}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  startIcon={<CalendarToday />}
-                  onClick={() => navigate(`/meal-plan/${mealPlan.id}`)}
-                >
-                  View
-                </Button>
-                <Button
-                  size="small"
-                  startIcon={<Edit />}
-                  onClick={() => navigate(`/meal-plan/${mealPlan.id}`)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  size="small"
-                  color="error"
-                  startIcon={<Delete />}
-                  onClick={() => handleDeleteMealPlan(mealPlan.id)}
-                >
-                  Delete
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {mealPlans.length === 0 && !loading && (
-        <Box sx={{ textAlign: 'center', mt: 4 }}>
-          <Typography variant="h6" color="text.secondary">
-            No meal plans yet. Create your first one!
-          </Typography>
-        </Box>
+      {mealPlans.length === 0 ? (
+        <DashboardEmptyState onCreate={() => setOpenDialog(true)} />
+      ) : (
+        <Grid container spacing={3}>
+          {mealPlans.map((plan) => (
+            <Grid item xs={12} sm={6} md={4} key={plan.id}>
+              <MealPlanCard
+                plan={plan}
+                onView={(p) => navigate(`/meal-plan/${p.id}`)}
+                onDelete={handleDeleteMealPlan}
+              />
+            </Grid>
+          ))}
+        </Grid>
       )}
 
-      {/* Create Meal Plan Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="xs" fullWidth>
         <DialogTitle>Create New Meal Plan</DialogTitle>
         <DialogContent>
           <TextField
@@ -174,20 +146,18 @@ const MealPlansList = () => {
             value={newMealPlanName}
             onChange={(e) => setNewMealPlanName(e.target.value)}
             onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleCreateMealPlan();
-              }
+              if (e.key === 'Enter') handleCreateMealPlan();
             }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateMealPlan} variant="contained">
+          <Button onClick={handleCreateMealPlan} variant="contained" color="primary">
             Create
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 };
 

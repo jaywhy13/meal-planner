@@ -5,7 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MealPlansList from './components/MealPlansList';
 import MealPlanDetail from './components/MealPlanDetail';
 import FoodsManagement from './components/FoodsManagement';
-import Navbar from './components/Navbar';
+import MealSettingsPlaceholder from './components/MealSettingsPlaceholder';
+import Layout from './components/layout/Layout';
 import theme from './theme';
 
 function App() {
@@ -13,14 +14,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className="App">
-          <Navbar />
+        <Layout>
           <Routes>
             <Route path="/" element={<MealPlansList />} />
             <Route path="/meal-plan/:id" element={<MealPlanDetail />} />
             <Route path="/foods" element={<FoodsManagement />} />
+            <Route path="/meal-settings" element={<MealSettingsPlaceholder />} />
           </Routes>
-        </div>
+        </Layout>
       </Router>
     </ThemeProvider>
   );
