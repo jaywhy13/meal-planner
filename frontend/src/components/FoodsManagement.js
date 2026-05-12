@@ -33,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { foodsAPI } from '../services/api';
+import { FOOD_CATEGORIES, getCategoryColor } from '../constants/foodCategories';
 
 const FoodsManagement = () => {
   const navigate = useNavigate();
@@ -43,15 +44,6 @@ const FoodsManagement = () => {
   const [editingFood, setEditingFood] = useState(null);
   const [foodName, setFoodName] = useState('');
   const [foodCategory, setFoodCategory] = useState('');
-
-  const foodCategories = [
-    'Protein',
-    'Vegetable',
-    'Fruit',
-    'Grain',
-    'Dairy',
-    'Other',
-  ];
 
   useEffect(() => {
     fetchFoods();
@@ -138,18 +130,6 @@ const FoodsManagement = () => {
     } else {
       handleCreateFood();
     }
-  };
-
-  const getCategoryColor = (category) => {
-    const colors = {
-      'Protein': 'primary',
-      'Vegetable': 'success',
-      'Fruit': 'warning',
-      'Grain': 'info',
-      'Dairy': 'secondary',
-      'Other': 'default',
-    };
-    return colors[category] || 'default';
   };
 
   if (loading) {
@@ -271,7 +251,7 @@ const FoodsManagement = () => {
               SelectProps={{ native: true }}
             >
               <option value="">Select a category...</option>
-              {foodCategories.map((category) => (
+              {FOOD_CATEGORIES.map((category) => (
                 <option key={category} value={category}>
                   {category}
                 </option>
