@@ -7,14 +7,7 @@ import MealCell from './MealCell';
 const ROW_LABEL_WIDTH = 90;
 const DAYS = [1, 2, 3, 4, 5, 6, 7];
 
-const WeekGrid = ({
-  weekStart,
-  mealTypes,
-  meals,
-  onAddMeal,
-  onEditMeal,
-  onDeleteMeal,
-}) => {
+const WeekGrid = ({ weekStart, mealTypes, meals, onAddMeal, onEditMeal }) => {
   const today = dayjs().startOf('day');
   const days = DAYS.map((dayNum) => {
     const date = weekStart.add(dayNum - 1, 'day');
@@ -113,7 +106,6 @@ const WeekGrid = ({
                   isToday={isToday}
                   onAdd={() => onAddMeal({ day: dayNum, mealType: type.value })}
                   onEdit={onEditMeal}
-                  onDelete={onDeleteMeal}
                 />
               );
             })}

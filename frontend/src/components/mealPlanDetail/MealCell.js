@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, IconButton, Menu, MenuItem } from '@mui/material';
-import { MoreVert, Edit, Delete } from '@mui/icons-material';
+import React from 'react';
+import { Box, Typography } from '@mui/material';
 import { colors, semantic, radius, shadows } from '../../theme/tokens';
 import { getEmojiForFoods } from '../../constants/foodEmojis';
 
@@ -43,15 +42,19 @@ const EmptyCell = ({ onAdd, isToday }) => (
   </Box>
 );
 
-const FilledCell = ({ meal, onEdit, onDelete, isToday }) => {
-  const [menuAnchor, setMenuAnchor] = useState(null);
+const FilledCell = ({ meal, onEdit, isToday }) => {
   const emoji = getEmojiForFoods(meal.foods);
   const label = summarize(meal.foods) || '(empty)';
 
   return (
     <Box
+      role="button"
+      tabIndex={0}
+      onClick={() => onEdit(meal)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onEdit(meal);
+      }}
       sx={{
-        position: 'relative',
         height: CELL_HEIGHT,
         borderRadius: `${radius.r12}px`,
         bgcolor: semantic.bgCard,
@@ -68,13 +71,7 @@ const FilledCell = ({ meal, onEdit, onDelete, isToday }) => {
         '&:hover': {
           transform: 'translateY(-1px)',
           boxShadow: '0 6px 20px rgba(17, 24, 39, 0.08)',
-          '& .meal-cell-menu': { opacity: 1 },
         },
-      }}
-      onClick={(e) => {
-        if (menuAnchor) return;
-        if (e.target.closest('.meal-cell-menu')) return;
-        onEdit(meal);
       }}
     >
       <Box sx={{ fontSize: 28, mb: 0.5 }}>{emoji}</Box>
@@ -92,58 +89,13 @@ const FilledCell = ({ meal, onEdit, onDelete, isToday }) => {
       >
         {label}
       </Typography>
-
-      <IconButton
-        className="meal-cell-menu"
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          setMenuAnchor(e.currentTarget);
-        }}
-        sx={{
-          position: 'absolute',
-          top: 4,
-          right: 4,
-          opacity: menuAnchor ? 1 : 0,
-          transition: 'opacity 120ms ease',
-        }}
-        aria-label="Meal options"
-      >
-        <MoreVert fontSize="small" />
-      </IconButton>
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={() => setMenuAnchor(null)}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <MenuItem
-          onClick={() => {
-            setMenuAnchor(null);
-            onEdit(meal);
-          }}
-        >
-          <Edit fontSize="small" sx={{ mr: 1 }} />
-          Edit
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setMenuAnchor(null);
-            onDelete(meal);
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Delete fontSize="small" sx={{ mr: 1 }} />
-          Delete
-        </MenuItem>
-      </Menu>
     </Box>
   );
 };
 
-const MealCell = ({ meal, onAdd, onEdit, onDelete, isToday }) =>
+const MealCell = ({ meal, onAdd, onEdit, isToday }) =>
   meal ? (
-    <FilledCell meal={meal} onEdit={onEdit} onDelete={onDelete} isToday={isToday} />
+    <FilledCell meal={meal} onEdit={onEdit} isToday={isToday} />
   ) : (
     <EmptyCell onAdd={onAdd} isToday={isToday} />
   );

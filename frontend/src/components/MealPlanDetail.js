@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -17,7 +17,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { AutoAwesome, Settings, Save } from '@mui/icons-material';
+import { AutoAwesome, Settings, Save, Delete } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
@@ -108,29 +108,18 @@ const MealPlanDetail = () => {
     }
   };
 
-  const planStart = useMemo(
-    () => (mealPlan ? dayjs(mealPlan.created_at).startOf('week').add(1, 'day') : dayjs().startOf('week').add(1, 'day')),
-    [mealPlan],
-  );
-
-  const weekStart = useMemo(
-    () => planStart.add((currentWeek - 1) * 7, 'day'),
-    [planStart, currentWeek],
-  );
-
+  // Anchor Week 1 to the Monday of the week the plan was created.
+  // dayjs treats Sunday as the start of the week, so we shift +1 day.
+  const anchor = mealPlan ? dayjs(mealPlan.created_at) : dayjs();
+  const weekStart = anchor.startOf('week').add(1, 'day').add((currentWeek - 1) * 7, 'day');
   const weekEnd = weekStart.add(6, 'day');
-
   const rangeLabel = `${weekStart.format('MMM D')} – ${weekEnd.format('MMM D, YYYY')}`;
 
-  const enabledMealTypes = useMemo(() => {
-    if (!mealSettings) return MEAL_TYPES;
-    return MEAL_TYPES.filter((t) => mealSettings[`${t.value}_enabled`] !== false);
-  }, [mealSettings]);
+  const enabledMealTypes = mealSettings
+    ? MEAL_TYPES.filter((t) => mealSettings[`${t.value}_enabled`] !== false)
+    : MEAL_TYPES;
 
-  const mealsForCurrentWeek = useMemo(
-    () => dailyMeals.filter((m) => m.week === currentWeek),
-    [dailyMeals, currentWeek],
-  );
+  const mealsForCurrentWeek = dailyMeals.filter((m) => m.week === currentWeek);
 
   const openAddDialog = ({ day, mealType }) => {
     setEditingMeal(null);
@@ -187,11 +176,13 @@ const MealPlanDetail = () => {
     }
   };
 
-  const handleDeleteMeal = async (meal) => {
+  const handleDeleteMeal = async () => {
+    if (!editingMeal) return;
     if (!window.confirm('Delete this meal?')) return;
     try {
-      await dailyMealsAPI.delete(meal.id);
+      await dailyMealsAPI.delete(editingMeal.id);
       await fetchDailyMeals();
+      setOpenDialog(false);
     } catch (err) {
       setError('Failed to delete meal');
     }
@@ -317,7 +308,6 @@ const MealPlanDetail = () => {
         meals={mealsForCurrentWeek}
         onAddMeal={openAddDialog}
         onEditMeal={openEditDialog}
-        onDeleteMeal={handleDeleteMeal}
       />
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
@@ -417,11 +407,20 @@ const MealPlanDetail = () => {
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveMeal} variant="contained" color="primary" startIcon={<Save />}>
-            Save
-          </Button>
+        <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
+          <Box>
+            {editingMeal && (
+              <Button onClick={handleDeleteMeal} color="error" startIcon={<Delete />}>
+                Delete
+              </Button>
+            )}
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+            <Button onClick={handleSaveMeal} variant="contained" color="primary" startIcon={<Save />}>
+              Save
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
 
