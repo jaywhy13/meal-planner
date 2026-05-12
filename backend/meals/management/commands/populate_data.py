@@ -40,7 +40,13 @@ class Command(BaseCommand):
             {'name': 'Oats', 'category': 'Grain'},
             {'name': 'Whole Wheat Bread', 'category': 'Grain'},
             {'name': 'Pasta', 'category': 'Grain'},
-            
+
+            # Starches
+            {'name': 'Potato', 'category': 'Starch'},
+            {'name': 'Plantain', 'category': 'Starch'},
+            {'name': 'White Rice', 'category': 'Starch'},
+            {'name': 'Couscous', 'category': 'Starch'},
+
             # Dairy
             {'name': 'Milk', 'category': 'Dairy'},
             {'name': 'Cheese', 'category': 'Dairy'},

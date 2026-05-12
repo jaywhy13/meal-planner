@@ -35,6 +35,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
 import MealSettings from './MealSettings';
+import { FOOD_CATEGORIES } from '../constants/foodCategories';
 
 const MealPlanDetail = () => {
   const { id } = useParams();
@@ -62,15 +63,6 @@ const MealPlanDetail = () => {
     { value: 'lunch', label: 'Lunch' },
     { value: 'dinner', label: 'Dinner' },
     { value: 'snack', label: 'Snack' },
-  ];
-
-  const foodCategories = [
-    'Protein',
-    'Vegetable',
-    'Fruit',
-    'Grain',
-    'Dairy',
-    'Other',
   ];
 
   const dayNames = [
@@ -480,7 +472,7 @@ const MealPlanDetail = () => {
                   SelectProps={{ native: true }}
                 >
                   <option value="">Select...</option>
-                  {foodCategories.map((category) => (
+                  {FOOD_CATEGORIES.map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>
