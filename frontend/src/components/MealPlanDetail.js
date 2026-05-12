@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Container,
-  Typography,
   Box,
+  Typography,
   Button,
-  Grid,
-  Card,
-  CardContent,
   TextField,
   Autocomplete,
   Chip,
@@ -16,26 +12,29 @@ import {
   DialogActions,
   Alert,
   CircularProgress,
-  IconButton,
-  Tooltip,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
-import {
-  ArrowBack,
-  Add,
-  Edit,
-  Delete,
-  AutoAwesome,
-  Save,
-  Settings,
-} from '@mui/icons-material';
+import { AutoAwesome, Settings, Save } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
 import MealSettings from './MealSettings';
 import { FOOD_CATEGORIES } from '../constants/foodCategories';
+import { colors, semantic, shadows } from '../theme/tokens';
+import DateRangeBar from './mealPlanDetail/DateRangeBar';
+import WeekGrid from './mealPlanDetail/WeekGrid';
+
+const MEAL_TYPES = [
+  { value: 'breakfast', label: 'Breakfast' },
+  { value: 'lunch', label: 'Lunch' },
+  { value: 'dinner', label: 'Dinner' },
+  { value: 'snack', label: 'Snack' },
+];
+
+const TOTAL_WEEKS = 4;
 
 const MealPlanDetail = () => {
   const { id } = useParams();
@@ -46,34 +45,16 @@ const MealPlanDetail = () => {
   const [mealSettings, setMealSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingMeal, setEditingMeal] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedWeek, setSelectedWeek] = useState(1);
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [currentWeek, setCurrentWeek] = useState(1);
   const [selectedDay, setSelectedDay] = useState(1);
   const [selectedMealType, setSelectedMealType] = useState('breakfast');
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [notes, setNotes] = useState('');
   const [newFoodName, setNewFoodName] = useState('');
   const [newFoodCategory, setNewFoodCategory] = useState('');
-  const [showNewFoodForm, setShowNewFoodForm] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-  const mealTypes = [
-    { value: 'breakfast', label: 'Breakfast' },
-    { value: 'lunch', label: 'Lunch' },
-    { value: 'dinner', label: 'Dinner' },
-    { value: 'snack', label: 'Snack' },
-  ];
-
-  const dayNames = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
 
   useEffect(() => {
     if (id) {
@@ -95,7 +76,6 @@ const MealPlanDetail = () => {
       setMealPlan(response.data);
     } catch (err) {
       setError('Failed to fetch meal plan');
-      console.error('Error fetching meal plan:', err);
     }
   };
 
@@ -105,7 +85,6 @@ const MealPlanDetail = () => {
       setDailyMeals(response.data);
     } catch (err) {
       setError('Failed to fetch daily meals');
-      console.error('Error fetching daily meals:', err);
     } finally {
       setLoading(false);
     }
@@ -114,9 +93,7 @@ const MealPlanDetail = () => {
   const fetchMealSettings = async () => {
     try {
       const response = await mealSettingsAPI.getByMealPlan(id);
-      if (response.data.length > 0) {
-        setMealSettings(response.data[0]);
-      }
+      if (response.data.length > 0) setMealSettings(response.data[0]);
     } catch (err) {
       console.error('Error fetching meal settings:', err);
     }
@@ -131,13 +108,60 @@ const MealPlanDetail = () => {
     }
   };
 
-  const handleEditMeal = (meal) => {
+  const planStart = useMemo(
+    () => (mealPlan ? dayjs(mealPlan.created_at).startOf('week').add(1, 'day') : dayjs().startOf('week').add(1, 'day')),
+    [mealPlan],
+  );
+
+  const weekStart = useMemo(
+    () => planStart.add((currentWeek - 1) * 7, 'day'),
+    [planStart, currentWeek],
+  );
+
+  const weekEnd = weekStart.add(6, 'day');
+
+  const rangeLabel = `${weekStart.format('MMM D')} – ${weekEnd.format('MMM D, YYYY')}`;
+
+  const enabledMealTypes = useMemo(() => {
+    if (!mealSettings) return MEAL_TYPES;
+    return MEAL_TYPES.filter((t) => mealSettings[`${t.value}_enabled`] !== false);
+  }, [mealSettings]);
+
+  const mealsForCurrentWeek = useMemo(
+    () => dailyMeals.filter((m) => m.week === currentWeek),
+    [dailyMeals, currentWeek],
+  );
+
+  const openAddDialog = ({ day, mealType }) => {
+    setEditingMeal(null);
+    setSelectedDay(day);
+    setSelectedMealType(mealType);
+    setSelectedFoods([]);
+    setNotes('');
+    setNewFoodName('');
+    setNewFoodCategory('');
+    setOpenDialog(true);
+  };
+
+  const openEditDialog = (meal) => {
     setEditingMeal(meal);
-    setSelectedWeek(meal.week);
     setSelectedDay(meal.day);
     setSelectedMealType(meal.meal_type);
     setSelectedFoods(meal.foods || []);
     setNotes(meal.notes || '');
+    setNewFoodName('');
+    setNewFoodCategory('');
+    setOpenDialog(true);
+  };
+
+  const openAddDialogTopLevel = () => {
+    setEditingMeal(null);
+    setSelectedDay(1);
+    setSelectedMealType('breakfast');
+    setSelectedFoods([]);
+    setNotes('');
+    setNewFoodName('');
+    setNewFoodCategory('');
     setOpenDialog(true);
   };
 
@@ -145,39 +169,31 @@ const MealPlanDetail = () => {
     try {
       const mealData = {
         meal_plan: id,
-        week: selectedWeek,
+        week: currentWeek,
         day: selectedDay,
         meal_type: selectedMealType,
-        food_ids: selectedFoods.map(food => food.id),
-        notes: notes,
+        food_ids: selectedFoods.map((food) => food.id),
+        notes,
       };
-
-      console.log('Sending meal data:', mealData);
-
       if (editingMeal) {
         await dailyMealsAPI.update(editingMeal.id, mealData);
       } else {
         await dailyMealsAPI.create(mealData);
       }
-
       await fetchDailyMeals();
       setOpenDialog(false);
-      resetForm();
     } catch (err) {
       setError('Failed to save meal');
-      console.error('Error saving meal:', err);
     }
   };
 
-  const handleDeleteMeal = async (mealId) => {
-    if (!window.confirm('Are you sure you want to delete this meal?')) return;
-
+  const handleDeleteMeal = async (meal) => {
+    if (!window.confirm('Delete this meal?')) return;
     try {
-      await dailyMealsAPI.delete(mealId);
+      await dailyMealsAPI.delete(meal.id);
       await fetchDailyMeals();
     } catch (err) {
       setError('Failed to delete meal');
-      console.error('Error deleting meal:', err);
     }
   };
 
@@ -187,111 +203,96 @@ const MealPlanDetail = () => {
       await fetchDailyMeals();
     } catch (err) {
       setError('Failed to generate meal plan');
-      console.error('Error generating meal plan:', err);
     }
   };
 
   const handleCreateNewFood = async () => {
     if (!newFoodName.trim()) return;
-
     try {
       const response = await foodsAPI.create({
         name: newFoodName.trim(),
         category: newFoodCategory || 'Other',
       });
-      
       setFoods([...foods, response.data]);
       setSelectedFoods([...selectedFoods, response.data]);
-      
       setNewFoodName('');
       setNewFoodCategory('');
-      setShowNewFoodForm(false);
     } catch (err) {
       setError('Failed to create new food');
-      console.error('Error creating food:', err);
     }
-  };
-
-  const resetForm = () => {
-    setEditingMeal(null);
-    setSelectedWeek(1);
-    setSelectedDay(1);
-    setSelectedMealType('breakfast');
-    setSelectedFoods([]);
-    setNotes('');
-    setNewFoodName('');
-    setNewFoodCategory('');
-    setShowNewFoodForm(false);
-  };
-
-  const getMealForWeekDay = (week, day, mealType) => {
-    return dailyMeals.find(
-      meal => meal.week === week && meal.day === day && meal.meal_type === mealType
-    );
-  };
-
-  const getEnabledMealTypes = () => {
-    if (!mealSettings) return mealTypes;
-    
-    return mealTypes.filter(mealType => {
-      const settingKey = `${mealType.value}_enabled`;
-      return mealSettings[settingKey] !== false;
-    });
   };
 
   if (loading) {
     return (
-      <Container sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   if (!mealPlan) {
     return (
-      <Container sx={{ mt: 4 }}>
+      <Box sx={{ p: 4 }}>
         <Alert severity="error">Meal plan not found</Alert>
-      </Container>
+      </Box>
     );
   }
 
-  const enabledMealTypes = getEnabledMealTypes();
-
   return (
-    <Container maxWidth="xl" sx={{ mt: 2, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <IconButton onClick={() => navigate('/')}>
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="h4" component="h1">
+    <Box sx={{ px: { xs: 3, md: 5 }, py: { xs: 3, md: 4 }, minHeight: '100vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          mb: 3,
+          gap: 2,
+          flexWrap: 'wrap',
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Box
+            role="button"
+            tabIndex={0}
+            onClick={() => navigate('/')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') navigate('/');
+            }}
+            sx={{
+              display: 'inline-block',
+              color: colors.green600,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              mb: 0.5,
+              '&:hover': { textDecoration: 'underline' },
+            }}
+          >
+            ← Meal Plans
+          </Box>
+          <Typography variant="h1" sx={{ color: semantic.textPrimary }}>
             {mealPlan.name}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<Settings />}
-            onClick={() => setSettingsOpen(true)}
-          >
-            Meal Settings
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+          <Button variant="outlined" startIcon={<Settings />} onClick={() => setSettingsOpen(true)}>
+            Settings
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<AutoAwesome />}
-            onClick={handleGenerateMealPlan}
-          >
-            Generate Plan
+          <Button variant="outlined" startIcon={<AutoAwesome />} onClick={handleGenerateMealPlan}>
+            Generate
           </Button>
           <Button
             variant="contained"
-            startIcon={<Add />}
-            onClick={() => {
-              resetForm();
-              setOpenDialog(true);
+            color="primary"
+            onClick={openAddDialogTopLevel}
+            sx={{
+              px: 3,
+              py: 1.25,
+              boxShadow: shadows.buttonGlow,
+              '&:hover': { boxShadow: shadows.buttonGlow },
             }}
           >
-            Add Meal
+            + Add Meal
           </Button>
         </Box>
       </Box>
@@ -302,134 +303,64 @@ const MealPlanDetail = () => {
         </Alert>
       )}
 
-      {/* 4-Week Meal Plan Grid */}
-      {[1, 2, 3, 4].map(week => (
-        <Card key={week} sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Week {week}
-            </Typography>
-            
-            <Grid container spacing={2}>
-              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                <Grid item xs={12} sm={6} md={1.71} key={day}>
-                  <Card variant="outlined" sx={{ height: "100%" }}>
-                    <CardContent sx={{ p: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        {dayNames[day - 1]}
-                      </Typography>
-                      
-                      {enabledMealTypes.map((mealType) => {
-                        const meal = getMealForWeekDay(week, day, mealType.value);
-                        return (
-                          <Box key={mealType.value} sx={{ mb: 1 }}>
-                            <Typography variant="caption" color="text.secondary">
-                              {mealType.label}:
-                            </Typography>
-                            {meal ? (
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography variant="caption" sx={{ flexGrow: 1 }}>
-                                  {meal.foods?.map(food => food.name).join(', ') || 'No foods'}
-                                </Typography>
-                                <Tooltip title="Edit">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleEditMeal(meal)}
-                                  >
-                                    <Edit fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Delete">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleDeleteMeal(meal.id)}
-                                  >
-                                    <Delete fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            ) : (
-                              <Button
-                                size="small"
-                                variant="text"
-                                onClick={() => {
-                                  resetForm();
-                                  setSelectedWeek(week);
-                                  setSelectedDay(day);
-                                  setSelectedMealType(mealType.value);
-                                  setOpenDialog(true);
-                                }}
-                              >
-                                Add
-                              </Button>
-                            )}
-                          </Box>
-                        );
-                      })}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      ))}
+      <DateRangeBar
+        label={rangeLabel}
+        onPrev={() => setCurrentWeek((w) => Math.max(1, w - 1))}
+        onNext={() => setCurrentWeek((w) => Math.min(TOTAL_WEEKS, w + 1))}
+        canPrev={currentWeek > 1}
+        canNext={currentWeek < TOTAL_WEEKS}
+      />
 
-      {/* Add/Edit Meal Dialog */}
+      <WeekGrid
+        weekStart={weekStart}
+        mealTypes={enabledMealTypes}
+        meals={mealsForCurrentWeek}
+        onAddMeal={openAddDialog}
+        onEditMeal={openEditDialog}
+        onDeleteMeal={handleDeleteMeal}
+      />
+
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {editingMeal ? 'Edit Meal' : 'Add New Meal'}
-        </DialogTitle>
+        <DialogTitle>{editingMeal ? 'Edit Meal' : 'Add Meal'}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel>Week</InputLabel>
-              <Select
-                value={selectedWeek}
-                onChange={(e) => setSelectedWeek(e.target.value)}
-                label="Week"
-              >
-                {[1, 2, 3, 4].map(week => (
-                  <MenuItem key={week} value={week}>Week {week}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            <FormControl fullWidth>
-              <InputLabel>Day</InputLabel>
-              <Select
-                value={selectedDay}
-                onChange={(e) => setSelectedDay(e.target.value)}
-                label="Day"
-              >
-                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                  <MenuItem key={day} value={day}>
-                    {dayNames[day - 1]}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            <TextField
-              select
-              label="Meal Type"
-              value={selectedMealType}
-              onChange={(e) => setSelectedMealType(e.target.value)}
-              SelectProps={{ native: true }}
-            >
-              {mealTypes.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </TextField>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel>Day</InputLabel>
+                <Select
+                  value={selectedDay}
+                  onChange={(e) => setSelectedDay(e.target.value)}
+                  label="Day"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                    <MenuItem key={day} value={day}>
+                      {weekStart.add(day - 1, 'day').format('ddd, MMM D')}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel>Meal Type</InputLabel>
+                <Select
+                  value={selectedMealType}
+                  onChange={(e) => setSelectedMealType(e.target.value)}
+                  label="Meal Type"
+                >
+                  {MEAL_TYPES.map((t) => (
+                    <MenuItem key={t.value} value={t.value}>
+                      {t.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
 
             <Autocomplete
               multiple
               options={foods}
               getOptionLabel={(option) => option.name}
               value={selectedFoods}
-              onChange={(event, newValue) => setSelectedFoods(newValue)}
+              onChange={(e, newValue) => setSelectedFoods(newValue)}
               renderTags={(value, getTagProps) =>
                 value.map((option, index) => (
                   <Chip
@@ -440,23 +371,16 @@ const MealPlanDetail = () => {
                   />
                 ))
               }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Foods"
-                  placeholder="Select foods..."
-                />
-              )}
+              renderInput={(params) => <TextField {...params} label="Foods" placeholder="Select foods..." />}
             />
 
-            {/* New Food Creation Form */}
-            <Box sx={{ border: '1px dashed #ccc', p: 2, borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Add New Food
+            <Box sx={{ border: `1px dashed ${semantic.borderDefault}`, p: 2, borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1.5 }}>
+                Add a new food
               </Typography>
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                 <TextField
-                  label="Food Name"
+                  label="Name"
                   value={newFoodName}
                   onChange={(e) => setNewFoodName(e.target.value)}
                   size="small"
@@ -468,7 +392,7 @@ const MealPlanDetail = () => {
                   value={newFoodCategory}
                   onChange={(e) => setNewFoodCategory(e.target.value)}
                   size="small"
-                  sx={{ minWidth: 120 }}
+                  sx={{ minWidth: 130 }}
                   SelectProps={{ native: true }}
                 >
                   <option value="">Select...</option>
@@ -478,13 +402,8 @@ const MealPlanDetail = () => {
                     </option>
                   ))}
                 </TextField>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={handleCreateNewFood}
-                  disabled={!newFoodName.trim()}
-                >
-                  Add Food
+                <Button variant="outlined" size="small" onClick={handleCreateNewFood} disabled={!newFoodName.trim()}>
+                  Add
                 </Button>
               </Box>
             </Box>
@@ -500,13 +419,12 @@ const MealPlanDetail = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleSaveMeal} variant="contained" startIcon={<Save />}>
+          <Button onClick={handleSaveMeal} variant="contained" color="primary" startIcon={<Save />}>
             Save
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Meal Settings Dialog */}
       <MealSettings
         mealPlanId={id}
         open={settingsOpen}
@@ -515,7 +433,7 @@ const MealPlanDetail = () => {
           fetchMealSettings();
         }}
       />
-    </Container>
+    </Box>
   );
 };
 
