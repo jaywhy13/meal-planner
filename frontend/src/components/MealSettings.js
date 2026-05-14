@@ -25,6 +25,8 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
     if (open && mealPlanId) {
       fetchMealSettings();
     }
+    // fetchMealSettings is stable; adding it would cause infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, mealPlanId]);
 
   const fetchMealSettings = async () => {
