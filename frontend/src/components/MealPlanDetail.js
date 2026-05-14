@@ -59,6 +59,8 @@ const MealPlanDetail = () => {
       fetchMealPlan();
       fetchFoods();
     }
+    // fetchMealPlan and fetchFoods are stable; adding them would cause infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -71,6 +73,8 @@ const MealPlanDetail = () => {
       const daysSinceStart = dayjs().startOf('day').diff(planMonday, 'day');
       setCurrentWeek(Math.max(1, Math.floor(daysSinceStart / 7) + 1));
     }
+    // fetchDailyMeals and fetchMealSettings are stable; adding them would cause infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mealPlan]);
 
   const fetchMealPlan = async () => {
