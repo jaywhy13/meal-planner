@@ -1,15 +1,12 @@
 name: Deploy
 
 on:
-  workflow_run:
-    workflows: ["Frontend CI"]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: meal-plans
     steps:
