@@ -50,12 +50,19 @@ class DailyMeal(models.Model):
 
 
 class MealSettings(models.Model):
-    """Settings for which meal types are enabled in a meal plan"""
+    """Settings for which meal types and days of the week are enabled in a meal plan"""
     meal_plan = models.OneToOneField(MealPlan, on_delete=models.CASCADE, related_name='meal_settings')
     breakfast_enabled = models.BooleanField(default=True)
     lunch_enabled = models.BooleanField(default=True)
     dinner_enabled = models.BooleanField(default=True)
     snack_enabled = models.BooleanField(default=True)
+    monday_enabled = models.BooleanField(default=True)
+    tuesday_enabled = models.BooleanField(default=True)
+    wednesday_enabled = models.BooleanField(default=True)
+    thursday_enabled = models.BooleanField(default=True)
+    friday_enabled = models.BooleanField(default=True)
+    saturday_enabled = models.BooleanField(default=True)
+    sunday_enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

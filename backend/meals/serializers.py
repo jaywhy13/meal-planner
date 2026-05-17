@@ -49,7 +49,13 @@ class DailyMealSerializer(serializers.ModelSerializer):
 class MealSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MealSettings
-        fields = ['id', 'breakfast_enabled', 'lunch_enabled', 'dinner_enabled', 'snack_enabled', 'created_at', 'updated_at']
+        fields = [
+            'id',
+            'breakfast_enabled', 'lunch_enabled', 'dinner_enabled', 'snack_enabled',
+            'monday_enabled', 'tuesday_enabled', 'wednesday_enabled', 'thursday_enabled',
+            'friday_enabled', 'saturday_enabled', 'sunday_enabled',
+            'created_at', 'updated_at',
+        ]
 
 
 class MealPlanSerializer(serializers.ModelSerializer):
