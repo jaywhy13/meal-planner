@@ -3,8 +3,9 @@ from django.contrib.auth.models import User
 
 
 class MealPlan(models.Model):
-    """Represents a meal plan with a name and date range"""
+    """Represents a meal plan anchored to a calendar month"""
     name = models.CharField(max_length=200)
+    start_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
