@@ -17,15 +17,16 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { AutoAwesome, Settings, Save, Delete } from '@mui/icons-material';
+import { AutoAwesome, Settings, Save, Delete, GridView, FormatListBulleted } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
 import MealSettings from './MealSettings';
 import { FOOD_CATEGORIES } from '../constants/foodCategories';
-import { colors, semantic, shadows } from '../theme/tokens';
+import { colors, semantic, shadows, radius } from '../theme/tokens';
 import DateRangeBar from './mealPlanDetail/DateRangeBar';
 import WeekGrid from './mealPlanDetail/WeekGrid';
+import WeekList from './mealPlanDetail/WeekList';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Breakfast' },
@@ -53,6 +54,8 @@ const MealPlanDetail = () => {
   const [newFoodName, setNewFoodName] = useState('');
   const [newFoodCategory, setNewFoodCategory] = useState('');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+  const [currentMonth, setCurrentMonth] = useState(dayjs().startOf('month'));
 
   useEffect(() => {
     if (id) {
@@ -129,7 +132,8 @@ const MealPlanDetail = () => {
 
   const mealsForCurrentWeek = dailyMeals.filter((m) => m.week === currentWeek);
 
-  const openAddDialog = ({ day, mealType }) => {
+  const openAddDialog = ({ day, mealType, week }) => {
+    if (week !== undefined) setCurrentWeek(week);
     setEditingMeal(null);
     setSelectedDay(day);
     setSelectedMealType(mealType);
@@ -141,6 +145,7 @@ const MealPlanDetail = () => {
   };
 
   const openEditDialog = (meal) => {
+    setCurrentWeek(meal.week);
     setEditingMeal(meal);
     setSelectedDay(meal.day);
     setSelectedMealType(meal.meal_type);
@@ -273,7 +278,47 @@ const MealPlanDetail = () => {
             {mealPlan.name}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Grid / List view toggle */}
+          <Box
+            sx={{
+              display: 'flex',
+              border: `1px solid ${semantic.borderDefault}`,
+              borderRadius: `${radius.r8}px`,
+              overflow: 'hidden',
+            }}
+          >
+            {[
+              { mode: 'grid', label: 'Grid', Icon: GridView },
+              { mode: 'list', label: 'List', Icon: FormatListBulleted },
+            ].map(({ mode, label, Icon }, i) => (
+              <Box
+                key={mode}
+                component="button"
+                onClick={() => setViewMode(mode)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  px: 1.5,
+                  py: 0.75,
+                  bgcolor: viewMode === mode ? colors.gray100 : 'transparent',
+                  border: 'none',
+                  borderRight: i === 0 ? `1px solid ${semantic.borderDefault}` : 'none',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: viewMode === mode ? 600 : 400,
+                  color: viewMode === mode ? semantic.textPrimary : semantic.textMuted,
+                  fontFamily: 'inherit',
+                  transition: 'background-color 120ms',
+                }}
+              >
+                <Icon sx={{ fontSize: 16 }} />
+                {label}
+              </Box>
+            ))}
+          </Box>
+
           <Button variant="outlined" startIcon={<Settings />} onClick={() => setSettingsOpen(true)}>
             Settings
           </Button>
@@ -303,20 +348,39 @@ const MealPlanDetail = () => {
       )}
 
       <DateRangeBar
-        label={rangeLabel}
-        onPrev={() => setCurrentWeek((w) => Math.max(1, w - 1))}
-        onNext={() => setCurrentWeek((w) => w + 1)}
-        canPrev={currentWeek > 1}
+        label={viewMode === 'list' ? currentMonth.format('MMMM YYYY') : rangeLabel}
+        onPrev={
+          viewMode === 'list'
+            ? () => setCurrentMonth((m) => m.subtract(1, 'month'))
+            : () => setCurrentWeek((w) => Math.max(1, w - 1))
+        }
+        onNext={
+          viewMode === 'list'
+            ? () => setCurrentMonth((m) => m.add(1, 'month'))
+            : () => setCurrentWeek((w) => w + 1)
+        }
+        canPrev={viewMode === 'list' ? true : currentWeek > 1}
         canNext
       />
 
-      <WeekGrid
-        weekStart={weekStart}
-        mealTypes={enabledMealTypes}
-        meals={mealsForCurrentWeek}
-        onAddMeal={openAddDialog}
-        onEditMeal={openEditDialog}
-      />
+      {viewMode === 'grid' ? (
+        <WeekGrid
+          weekStart={weekStart}
+          mealTypes={enabledMealTypes}
+          meals={mealsForCurrentWeek}
+          onAddMeal={openAddDialog}
+          onEditMeal={openEditDialog}
+        />
+      ) : (
+        <WeekList
+          anchor={week1Start}
+          currentMonth={currentMonth}
+          mealTypes={enabledMealTypes}
+          meals={dailyMeals}
+          onAddMeal={openAddDialog}
+          onEditMeal={openEditDialog}
+        />
+      )}
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editingMeal ? 'Edit Meal' : 'Add Meal'}</DialogTitle>
