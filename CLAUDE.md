@@ -6,39 +6,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Full-stack meal planning application with a **Django REST API backend** and **React frontend**. Supports creating meal plans, managing foods, configuring meal settings, and viewing daily meal suggestions.
 
+## Docker-First Policy
+
+**Never run `python`, `yarn`, `pip`, or `manage.py` directly on the host.** All project operations go through Docker via `make`. This ensures a consistent environment and avoids local dependency issues.
+
+There are three Makefiles:
+
+| Location | Purpose |
+|---|---|
+| Root `Makefile` | Project lifecycle (`init`, `start`, `stop`) and AWS Lambda infrastructure |
+| `backend/Makefile` | Django operations (migrations, tests, seeding) |
+| `frontend/Makefile` | React operations (tests, builds) |
+
+The `lambda-*` targets in the root `Makefile` are exclusively for AWS infrastructure — never use them for local development.
+
 ## Development Commands
 
-### Recommended: Docker (Primary Workflow)
+### Project lifecycle (run from repo root)
 
 ```bash
-make init    # First-time setup: creates .env files and builds containers
-make start   # Start all services with hot-reload (frontend + backend + db)
+make init    # First-time setup: creates empty .env files and builds containers
+make start   # Start all services with hot-reload (frontend + backend)
 make stop    # Stop all services
-make ssh     # SSH into the backend container
+make ssh     # Open a bash shell in the backend container
 ```
 
-### Backend (Django)
+### Backend (run from `backend/`)
 
-From `backend/`:
 ```bash
-python manage.py runserver          # Dev server on :8000
-python manage.py migrate            # Apply migrations
-python manage.py makemigrations     # Create new migrations
-python manage.py populate_data      # Load initial food/meal data
-python manage.py test               # Run backend tests
-python manage.py test meals.tests.SpecificTest  # Run a single test
+make migrate                              # Apply database migrations
+make makemigrations                       # Create migrations for all apps
+make makemigrations ARGS="meals --name my_migration"  # Named migration
+make seed                                 # Load initial food/meal data
+make test                                 # Run all backend tests
+make test TEST=meals.tests.SpecificTest   # Run a specific test
 ```
 
-### Frontend (React)
+### Frontend (run from `frontend/`)
 
-From `frontend/`:
 ```bash
-yarn start   # Dev server on :3000 (used in Docker)
-yarn test    # Run tests (React Testing Library + Jest)
-yarn build   # Production build
+make test    # Run all frontend tests (non-interactive)
+make build   # Production build
 ```
-
-> Note: Docker uses `yarn`; you can also use `npm` locally.
 
 ## Architecture
 
@@ -75,4 +84,4 @@ Deployed to **AWS Lambda** via `lambda_handler.py` and the Lambda-related `Makef
 | `SECRET_KEY` | Django secret key | Required in production |
 | `DEBUG` | Django debug mode | `True` in dev |
 
-`make init` generates the necessary `.env` files from templates.
+`make init` creates empty `.env` files — populate `backend/.env` and `frontend/.env` with the required values before starting.
