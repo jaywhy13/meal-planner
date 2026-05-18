@@ -1,5 +1,8 @@
+import calendar
+from datetime import date, timedelta
+
 from django.core.management.base import BaseCommand
-from meals.models import Food, MealSuggestion
+from meals.models import DailyMeal, Food, MealPlan, MealSettings, MealSuggestion
 
 
 class Command(BaseCommand):
@@ -118,6 +121,53 @@ class Command(BaseCommand):
                 suggestion.foods.set(foods)
                 self.stdout.write(f'Created meal suggestion: {suggestion.name}')
         
+        # Create sample MealPlan anchored to the first day of the current month
+        start_date = date.today().replace(day=1)
+        plan, plan_created = MealPlan.objects.get_or_create(
+            name='Sample Meal Plan',
+            defaults={'start_date': start_date},
+        )
+        if plan_created:
+            self.stdout.write(f'Created meal plan: {plan.name}')
+
+        # Ensure MealSettings exist for the plan
+        meal_settings, _ = MealSettings.objects.get_or_create(meal_plan=plan)
+
+        # Map ISO weekday (1-7) to MealSettings field name
+        day_field_map = {
+            1: 'monday_enabled', 2: 'tuesday_enabled', 3: 'wednesday_enabled',
+            4: 'thursday_enabled', 5: 'friday_enabled', 6: 'saturday_enabled',
+            7: 'sunday_enabled',
+        }
+
+        enabled_meal_types = [
+            mt for mt, field in [
+                ('breakfast', 'breakfast_enabled'), ('lunch', 'lunch_enabled'),
+                ('dinner', 'dinner_enabled'), ('snack', 'snack_enabled'),
+            ] if getattr(meal_settings, field)
+        ]
+
+        _, days_in_month = calendar.monthrange(start_date.year, start_date.month)
+        meals_created = 0
+        for offset in range(days_in_month):
+            current_date = start_date + timedelta(days=offset)
+            day_field = day_field_map[current_date.isoweekday()]
+            if not getattr(meal_settings, day_field):
+                continue
+
+            for meal_type in enabled_meal_types:
+                _, created = DailyMeal.objects.get_or_create(
+                    meal_plan=plan,
+                    date=current_date,
+                    meal_type=meal_type,
+                )
+                if created:
+                    meals_created += 1
+
         self.stdout.write(
-            self.style.SUCCESS('Successfully populated initial data!')
+            self.style.SUCCESS(
+                f'Successfully populated initial data! '
+                f'Sample Meal Plan seeded with {meals_created} new DailyMeal records '
+                f'for {start_date.strftime("%B %Y")}.'
+            )
         )

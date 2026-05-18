@@ -1,6 +1,8 @@
 import datetime
 
+from django.core.management import call_command
 from django.db import IntegrityError
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -203,3 +205,21 @@ class DailyMealSerializerTest(APITestCase):
     def test_serializer_does_not_expose_day(self):
         serializer = DailyMealSerializer(self.daily_meal)
         self.assertNotIn('day', serializer.data)
+
+
+class PopulateDataCommandTest(TestCase):
+    def test_creates_sample_meal_plan(self):
+        call_command('populate_data', verbosity=0)
+        self.assertTrue(MealPlan.objects.filter(name='Sample Meal Plan').exists())
+
+    def test_creates_daily_meals_for_current_month(self):
+        call_command('populate_data', verbosity=0)
+        plan = MealPlan.objects.get(name='Sample Meal Plan')
+        self.assertGreater(DailyMeal.objects.filter(meal_plan=plan).count(), 0)
+
+    def test_rerunning_does_not_create_duplicates(self):
+        call_command('populate_data', verbosity=0)
+        first_count = DailyMeal.objects.count()
+        call_command('populate_data', verbosity=0)
+        second_count = DailyMeal.objects.count()
+        self.assertEqual(first_count, second_count)
