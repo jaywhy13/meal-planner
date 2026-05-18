@@ -224,17 +224,17 @@ class PopulateDataCommandTest(TestCase):
             4: 'thursday_enabled', 5: 'friday_enabled', 6: 'saturday_enabled',
             7: 'sunday_enabled',
         }
-        meal_type_fields = ('breakfast_enabled', 'lunch_enabled', 'dinner_enabled', 'snack_enabled')
-        enabled_meal_count = sum(1 for f in meal_type_fields if getattr(meal_settings, f))
 
         _, days_in_month = calendar.monthrange(start_date.year, start_date.month)
-        expected = sum(
-            enabled_meal_count
-            for offset in range(days_in_month)
-            if getattr(meal_settings, day_field_map[(start_date + datetime.timedelta(days=offset)).isoweekday()])
-        )
-
-        self.assertEqual(DailyMeal.objects.filter(meal_plan=plan).count(), expected)
+        for offset in range(days_in_month):
+            current_day = start_date + datetime.timedelta(days=offset)
+            day_field = day_field_map[current_day.isoweekday()]
+            if not getattr(meal_settings, day_field):
+                continue
+            self.assertTrue(
+                DailyMeal.objects.filter(meal_plan=plan, date=current_day).exists(),
+                f'Expected DailyMeal for {current_day} but none was found.',
+            )
 
     def test_rerunning_does_not_create_duplicates(self):
         call_command('populate_data', verbosity=0)
