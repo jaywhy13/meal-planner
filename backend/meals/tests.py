@@ -1,8 +1,12 @@
+import datetime
+
+from django.db import IntegrityError
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import MealPlan, MealSettings
+from .models import DailyMeal, MealPlan, MealSettings, MealType
+from .serializers import DailyMealSerializer
 
 
 class MealSettingsDayToggleTests(APITestCase):
@@ -73,3 +77,65 @@ class MealPlanStartDateTests(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['start_date'], '2026-05-01')
+
+
+class DailyMealModelTest(APITestCase):
+    def setUp(self):
+        self.meal_plan = MealPlan.objects.create(name='Test Plan', start_date='2026-05-01')
+
+    def test_monday_sets_day_of_week_1(self):
+        meal = DailyMeal.objects.create(
+            meal_plan=self.meal_plan,
+            date=datetime.date(2026, 5, 4),
+            meal_type=MealType.BREAKFAST,
+        )
+        self.assertEqual(meal.day_of_week, 1)
+
+    def test_sunday_sets_day_of_week_7(self):
+        meal = DailyMeal.objects.create(
+            meal_plan=self.meal_plan,
+            date=datetime.date(2026, 5, 10),
+            meal_type=MealType.LUNCH,
+        )
+        self.assertEqual(meal.day_of_week, 7)
+
+    def test_duplicate_meal_plan_date_meal_type_raises_integrity_error(self):
+        DailyMeal.objects.create(
+            meal_plan=self.meal_plan,
+            date=datetime.date(2026, 5, 4),
+            meal_type=MealType.DINNER,
+        )
+        with self.assertRaises(IntegrityError):
+            DailyMeal.objects.create(
+                meal_plan=self.meal_plan,
+                date=datetime.date(2026, 5, 4),
+                meal_type=MealType.DINNER,
+            )
+
+
+class DailyMealSerializerTest(APITestCase):
+    def setUp(self):
+        self.meal_plan = MealPlan.objects.create(name='Serializer Plan', start_date='2026-05-01')
+        self.daily_meal = DailyMeal.objects.create(
+            meal_plan=self.meal_plan,
+            date=datetime.date(2026, 5, 4),
+            meal_type=MealType.BREAKFAST,
+        )
+
+    def test_serializer_exposes_date(self):
+        serializer = DailyMealSerializer(self.daily_meal)
+        self.assertIn('date', serializer.data)
+        self.assertEqual(serializer.data['date'], '2026-05-04')
+
+    def test_serializer_exposes_day_of_week(self):
+        serializer = DailyMealSerializer(self.daily_meal)
+        self.assertIn('day_of_week', serializer.data)
+        self.assertEqual(serializer.data['day_of_week'], 1)
+
+    def test_serializer_does_not_expose_week(self):
+        serializer = DailyMealSerializer(self.daily_meal)
+        self.assertNotIn('week', serializer.data)
+
+    def test_serializer_does_not_expose_day(self):
+        serializer = DailyMealSerializer(self.daily_meal)
+        self.assertNotIn('day', serializer.data)
