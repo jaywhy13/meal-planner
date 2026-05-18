@@ -9,6 +9,70 @@ from .models import DailyMeal, MealPlan, MealSettings, MealType
 from .serializers import DailyMealSerializer
 
 
+class GenerateMealPlanTests(APITestCase):
+    def setUp(self):
+        self.plan = MealPlan.objects.create(name='Test Plan', start_date='2026-05-01')
+
+    def _generate_url(self):
+        return reverse('mealplan-generate-meal-plan', args=[self.plan.pk])
+
+    def test_generates_meals_for_full_month(self):
+        """All 31 days of May 2026 × 4 meal types = 124 DailyMeal records"""
+        response = self.client.post(self._generate_url(), {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        count = DailyMeal.objects.filter(meal_plan=self.plan).count()
+        self.assertEqual(count, 124)  # 31 days × 4 meal types
+
+    def test_disabled_weekend_skips_weekend_meals(self):
+        """No DailyMeal should have day_of_week 6 or 7 when weekends are disabled"""
+        MealSettings.objects.create(
+            meal_plan=self.plan,
+            saturday_enabled=False,
+            sunday_enabled=False,
+        )
+        response = self.client.post(self._generate_url(), {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        weekend_meals = DailyMeal.objects.filter(
+            meal_plan=self.plan, day_of_week__in=[6, 7]
+        )
+        self.assertEqual(weekend_meals.count(), 0)
+
+    def test_disabled_breakfast_skips_breakfast(self):
+        """No DailyMeal should have meal_type='breakfast' when breakfast is disabled"""
+        MealSettings.objects.create(meal_plan=self.plan, breakfast_enabled=False)
+        response = self.client.post(self._generate_url(), {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        breakfast_meals = DailyMeal.objects.filter(
+            meal_plan=self.plan, meal_type='breakfast'
+        )
+        self.assertEqual(breakfast_meals.count(), 0)
+
+    def test_wipe_true_deletes_existing_meals(self):
+        """wipe=True should delete pre-existing meals before generating fresh ones"""
+        pre_existing = DailyMeal.objects.create(
+            meal_plan=self.plan,
+            date=datetime.date(2026, 5, 1),
+            meal_type=MealType.BREAKFAST,
+        )
+        pre_pk = pre_existing.pk
+        response = self.client.post(self._generate_url(), {'wipe': True}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(DailyMeal.objects.filter(pk=pre_pk).exists())
+        self.assertTrue(DailyMeal.objects.filter(meal_plan=self.plan).exists())
+
+    def test_wipe_false_preserves_existing_meals(self):
+        """wipe=False (default) should leave the pre-existing meal untouched"""
+        pre_existing = DailyMeal.objects.create(
+            meal_plan=self.plan,
+            date=datetime.date(2026, 5, 1),
+            meal_type=MealType.BREAKFAST,
+        )
+        pre_pk = pre_existing.pk
+        response = self.client.post(self._generate_url(), {'wipe': False}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(DailyMeal.objects.filter(pk=pre_pk).exists())
+
+
 class MealSettingsDayToggleTests(APITestCase):
     def _create_plan_and_settings(self):
         plan = MealPlan.objects.create(name='Plan', start_date='2026-05-01')
