@@ -1,8 +1,10 @@
+import calendar
+from datetime import date, timedelta
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Q
-from datetime import datetime, timedelta
 from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
 from .serializers import (
     MealPlanSerializer, MealPlanListSerializer, FoodSerializer,
@@ -12,54 +14,60 @@ from .serializers import (
 
 class MealPlanViewSet(viewsets.ModelViewSet):
     queryset = MealPlan.objects.all()
-    
+
     def get_serializer_class(self):
         if self.action == 'list':
             return MealPlanListSerializer
         return MealPlanSerializer
-    
+
     @action(detail=True, methods=['post'])
     def generate_meal_plan(self, request, pk=None):
-        """Generate a meal plan with suggestions for 4 weeks"""
+        """Generate meals for the full calendar month of the plan's start_date"""
         meal_plan = self.get_object()
-        
-        # Get or create meal settings
-        meal_settings, created = MealSettings.objects.get_or_create(meal_plan=meal_plan)
-        
-        # Get healthy meal suggestions
+        wipe = request.data.get('wipe', False)
+
+        meal_settings, _ = MealSettings.objects.get_or_create(meal_plan=meal_plan)
         suggestions = MealSuggestion.objects.filter(is_healthy=True)
-        
-        # Generate meals for 4 weeks, 5 days each
-        for week in range(1, 5):  # Weeks 1-4
-            for day in range(1, 6):  # Days 1-5 (Monday-Friday)
-                # Get enabled meal types from settings
-                enabled_meal_types = []
-                if meal_settings.breakfast_enabled:
-                    enabled_meal_types.append('breakfast')
-                if meal_settings.lunch_enabled:
-                    enabled_meal_types.append('lunch')
-                if meal_settings.dinner_enabled:
-                    enabled_meal_types.append('dinner')
-                if meal_settings.snack_enabled:
-                    enabled_meal_types.append('snack')
-                
-                for meal_type in enabled_meal_types:
-                    # Check if meal already exists
-                    existing_meal, created = DailyMeal.objects.get_or_create(
-                        meal_plan=meal_plan,
-                        week=week,
-                        day=day,
-                        meal_type=meal_type
-                    )
-                    
-                    if created and suggestions.exists():
-                        # Assign a random suggestion for this meal type
-                        meal_suggestion = suggestions.filter(meal_type=meal_type).first()
-                        if meal_suggestion:
-                            existing_meal.foods.set(meal_suggestion.foods.all())
-                            existing_meal.notes = meal_suggestion.description
-                            existing_meal.save()
-        
+
+        if wipe:
+            meal_plan.daily_meals.all().delete()
+
+        # Map ISO weekday (1-7) to MealSettings field name
+        day_field_map = {
+            1: 'monday_enabled', 2: 'tuesday_enabled', 3: 'wednesday_enabled',
+            4: 'thursday_enabled', 5: 'friday_enabled', 6: 'saturday_enabled',
+            7: 'sunday_enabled',
+        }
+
+        enabled_meal_types = [
+            mt for mt, field in [
+                ('breakfast', 'breakfast_enabled'), ('lunch', 'lunch_enabled'),
+                ('dinner', 'dinner_enabled'), ('snack', 'snack_enabled'),
+            ] if getattr(meal_settings, field)
+        ]
+
+        start = meal_plan.start_date.replace(day=1)
+        _, days_in_month = calendar.monthrange(start.year, start.month)
+
+        for offset in range(days_in_month):
+            current_date = start + timedelta(days=offset)
+            day_field = day_field_map[current_date.isoweekday()]
+            if not getattr(meal_settings, day_field):
+                continue
+
+            for meal_type in enabled_meal_types:
+                meal, created = DailyMeal.objects.get_or_create(
+                    meal_plan=meal_plan,
+                    date=current_date,
+                    meal_type=meal_type,
+                )
+                if created and suggestions.exists():
+                    suggestion = suggestions.filter(meal_type=meal_type).first()
+                    if suggestion:
+                        meal.foods.set(suggestion.foods.all())
+                        meal.notes = suggestion.description
+                        meal.save()
+
         serializer = self.get_serializer(meal_plan)
         return Response(serializer.data)
 
