@@ -141,7 +141,7 @@ class Command(BaseCommand):
         }
 
         enabled_meal_types = [
-            mt for mt, field in [
+            meal_type for meal_type, field in [
                 ('breakfast', 'breakfast_enabled'), ('lunch', 'lunch_enabled'),
                 ('dinner', 'dinner_enabled'), ('snack', 'snack_enabled'),
             ] if getattr(meal_settings, field)

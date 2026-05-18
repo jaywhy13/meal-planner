@@ -1,3 +1,4 @@
+import calendar
 import datetime
 
 from django.core.management import call_command
@@ -212,10 +213,28 @@ class PopulateDataCommandTest(TestCase):
         call_command('populate_data', verbosity=0)
         self.assertTrue(MealPlan.objects.filter(name='Sample Meal Plan').exists())
 
-    def test_creates_daily_meals_for_current_month(self):
+    def test_creates_daily_meals_for_each_enabled_day(self):
         call_command('populate_data', verbosity=0)
         plan = MealPlan.objects.get(name='Sample Meal Plan')
-        self.assertGreater(DailyMeal.objects.filter(meal_plan=plan).count(), 0)
+        meal_settings = MealSettings.objects.get(meal_plan=plan)
+        start_date = plan.start_date
+
+        day_field_map = {
+            1: 'monday_enabled', 2: 'tuesday_enabled', 3: 'wednesday_enabled',
+            4: 'thursday_enabled', 5: 'friday_enabled', 6: 'saturday_enabled',
+            7: 'sunday_enabled',
+        }
+        meal_type_fields = ('breakfast_enabled', 'lunch_enabled', 'dinner_enabled', 'snack_enabled')
+        enabled_meal_count = sum(1 for f in meal_type_fields if getattr(meal_settings, f))
+
+        _, days_in_month = calendar.monthrange(start_date.year, start_date.month)
+        expected = sum(
+            enabled_meal_count
+            for offset in range(days_in_month)
+            if getattr(meal_settings, day_field_map[(start_date + datetime.timedelta(days=offset)).isoweekday()])
+        )
+
+        self.assertEqual(DailyMeal.objects.filter(meal_plan=plan).count(), expected)
 
     def test_rerunning_does_not_create_duplicates(self):
         call_command('populate_data', verbosity=0)
