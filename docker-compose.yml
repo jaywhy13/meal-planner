@@ -18,6 +18,8 @@ services:
     env_file:
       - ./frontend/.env
     restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
     develop:
       watch:
         - action: sync
