@@ -19,8 +19,8 @@ class FoodAdmin(admin.ModelAdmin):
 
 @admin.register(DailyMeal)
 class DailyMealAdmin(admin.ModelAdmin):
-    list_display = ['meal_plan', 'week', 'day', 'meal_type', 'foods_display']
-    list_filter = ['meal_type', 'week', 'day', 'meal_plan']
+    list_display = ['meal_plan', 'date', 'day_of_week', 'meal_type', 'foods_display']
+    list_filter = ['meal_type', 'day_of_week', 'meal_plan']
     search_fields = ['meal_plan__name', 'notes']
     filter_horizontal = ['foods']
     

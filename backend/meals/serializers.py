@@ -24,10 +24,11 @@ class DailyMealSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True
     )
-    
+    day_of_week = serializers.ReadOnlyField()
+
     class Meta:
         model = DailyMeal
-        fields = ['id', 'meal_plan', 'week', 'day', 'meal_type', 'foods', 'food_ids', 'notes']
+        fields = ['id', 'meal_plan', 'date', 'day_of_week', 'meal_type', 'foods', 'food_ids', 'notes']
     
     def create(self, validated_data):
         print("Received data:", validated_data)

@@ -34,20 +34,24 @@ class MealType(models.TextChoices):
 
 
 class DailyMeal(models.Model):
-    """Represents meals for a specific day in a meal plan"""
+    """Represents meals for a specific calendar date in a meal plan"""
     meal_plan = models.ForeignKey(MealPlan, on_delete=models.CASCADE, related_name='daily_meals')
-    week = models.PositiveIntegerField()  # Week 1-4
-    day = models.PositiveIntegerField()   # Day 1-5 (Monday-Friday)
+    date = models.DateField()
+    day_of_week = models.PositiveSmallIntegerField(db_index=True)  # ISO weekday: 1=Mon, 7=Sun
     meal_type = models.CharField(max_length=20, choices=MealType.choices)
     foods = models.ManyToManyField(Food, blank=True)
     notes = models.TextField(blank=True)
-    
+
     class Meta:
-        unique_together = ['meal_plan', 'week', 'day', 'meal_type']
-        ordering = ['week', 'day', 'meal_type']
-    
+        unique_together = ['meal_plan', 'date', 'meal_type']
+        ordering = ['date', 'meal_type']
+
+    def save(self, *args, **kwargs):
+        self.day_of_week = self.date.isoweekday()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.meal_plan.name} - Week {self.week}, Day {self.day} - {self.get_meal_type_display()}"
+        return f"{self.meal_plan.name} - {self.date} - {self.get_meal_type_display()}"
 
 
 class MealSettings(models.Model):
