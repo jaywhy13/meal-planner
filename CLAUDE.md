@@ -63,6 +63,71 @@ make test    # Run all frontend tests (non-interactive)
 make build   # Production build
 ```
 
+## Code Conventions
+
+### Naming
+
+- **No abbreviations.** Write `meal_settings`, not `ms`; `daily_meal`, not `dm`; `serving_count`, not `sc`.
+- **Name with intent.** When a generic name would let several different meanings pass the type check, encode the specific intent in the name. The reader shouldn't have to scan the body to know what's special about this value.
+
+  ```python
+  # Generic — what's notable about this plan? Have to read the body.
+  meal_plan = MealPlan.objects.create(name="Test")
+  assert DailyMeal.objects.filter(meal_plan=meal_plan).count() == 0
+
+  # Intentional — the name says what role this fixture plays.
+  meal_plan_without_meals = MealPlan.objects.create(name="Test")
+  assert DailyMeal.objects.filter(meal_plan=meal_plan_without_meals).count() == 0
+  ```
+
+  Same rule applies to local variables, function parameters, and React state. If a reviewer would ask "what is this for?", the name is wrong — rename rather than add a comment.
+
+### Comments
+
+- Default to no comments. Add one only when the *why* is non-obvious — e.g. "dayjs treats Sunday as week start, so we walk back to Monday manually."
+- Don't restate what the code does; rename the identifier instead.
+
+### One level of abstraction per method
+
+A method should read at a single level of abstraction. If the top of the method talks about high-level steps and the bottom is doing raw date math or hand-rolled ORM calls, split it: the outer method stays at the orchestration level and delegates each step to a helper that owns the details.
+
+```python
+# Mixes orchestration with calendar math and ORM internals
+def create_daily_meals_for_month(meal_plan):
+    year, month = meal_plan.start_date.year, meal_plan.start_date.month
+    last = calendar.monthrange(year, month)[1]
+    for day in range(1, last + 1):
+        current_day = date(year, month, day)
+        if current_day.weekday() in meal_plan.settings.enabled_weekday_indexes:
+            for meal_type in meal_plan.settings.enabled_meal_types.all():
+                DailyMeal.objects.create(
+                    meal_plan=meal_plan, date=current_day, meal_type=meal_type,
+                )
+
+# Each method reads at one level; details hide one level down
+def create_daily_meals_for_month(meal_plan):
+    for day in days_in_month(meal_plan.start_date):
+        if meal_plan.settings.includes(day):
+            create_daily_meals_for(meal_plan, day)
+```
+
+The first version forces the reader to context-switch between "what are we doing" and "how do we do each piece." The second reads like a sentence and each helper can be understood (and tested) on its own.
+
+### Tests
+
+- **Test behaviour, not implementation details.** Assertions should fix on observable outcomes — what a caller sees, what ends up in the database, what the HTTP response contains — not on which internal helpers were invoked or what intermediate variables held. When someone refactors the internals, the test should still pass; when the behaviour breaks, the test should fail.
+
+  Concretely: if a seed command creates a `DailyMeal` for every enabled day in the month, the test iterates the days and asserts each `DailyMeal` exists in the database. It does *not* mock the helper that builds a single meal and assert it was called N times — that pins the test to today's implementation and gives a green build even if the database ends up empty.
+
+- Prefer named-variable loops over compact comprehensions in assertions:
+
+  ```python
+  for current_day in days_in_month:
+      assert DailyMeal.objects.filter(date=current_day).exists()
+  ```
+
+  reads better than a nested `all(...)` one-liner.
+
 ## Architecture
 
 ### Backend (`backend/`)
