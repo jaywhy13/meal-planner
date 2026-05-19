@@ -31,6 +31,20 @@ make stop    # Stop all services
 make ssh     # Open a bash shell in the backend container
 ```
 
+### Worktree isolation (local agents only)
+
+This applies only to agents running locally on this machine. Cloud-hosted agents (e.g. sandboxed cloud runners) already get isolation from their environment and don't need this script.
+
+When working inside a Git worktree, **always prefix Docker/Make commands with `scripts/isolate-env-vars.sh`** so multiple worktrees can run side-by-side without colliding on host ports or container names:
+
+```bash
+scripts/isolate-env-vars.sh make start
+scripts/isolate-env-vars.sh make ssh
+scripts/isolate-env-vars.sh docker compose ps
+```
+
+The script derives a stable Compose project name and host-port offset from the worktree's root path and exports `COMPOSE_PROJECT_NAME`, `BACKEND_PORT`, `FRONTEND_PORT`, `DB_PORT`, and `REACT_APP_API_URL` before `exec`-ing the command. Without the prefix, everything runs on the default `8000/3000/5432` — same as before this script existed. The rest of the project (Makefiles, compose files, Django, React) only reads those env vars and knows nothing about worktrees.
+
 ### Backend (run from `backend/`)
 
 ```bash

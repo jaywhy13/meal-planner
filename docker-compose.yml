@@ -5,7 +5,7 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     env_file:
       - ./backend/.env
     restart: unless-stopped
@@ -14,9 +14,11 @@ services:
     build: ./frontend
     command: yarn run start
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     env_file:
       - ./frontend/.env
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:8000/api}
     restart: unless-stopped
     volumes:
       - ./frontend/src:/app/src
