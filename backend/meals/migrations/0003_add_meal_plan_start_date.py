@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('meals', '0001_initial'),
+        ('meals', '0002_add_meal_settings_day_toggles'),
     ]
 
     operations = [
