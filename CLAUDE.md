@@ -31,7 +31,9 @@ make stop    # Stop all services
 make ssh     # Open a bash shell in the backend container
 ```
 
-### Worktree isolation (agents: read this)
+### Worktree isolation (local agents only)
+
+This applies only to agents running locally on this machine. Cloud-hosted agents (e.g. sandboxed cloud runners) already get isolation from their environment and don't need this script.
 
 When working inside a Git worktree, **always prefix Docker/Make commands with `scripts/isolate-env-vars.sh`** so multiple worktrees can run side-by-side without colliding on host ports or container names:
 

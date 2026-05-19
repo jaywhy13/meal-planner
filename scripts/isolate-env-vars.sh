@@ -17,8 +17,8 @@ if [ "$#" -eq 0 ]; then
   exit 64
 fi
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-HASH="$(printf '%s' "$ROOT" | sha1sum | cut -c1-6)"
+WORKTREE_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+HASH="$(printf '%s' "$WORKTREE_ROOT" | sha1sum | cut -c1-6)"
 # 2 hex chars -> 0..255, mod 100, *10 -> port offset of 0..990 in steps of 10.
 OFFSET=$(( 0x${HASH:0:2} % 100 * 10 ))
 
