@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import logging
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import config
@@ -30,24 +31,15 @@ class RequestLoggingMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Log request details
-        print(f"=== Incoming Request ===")
-        print(f"Method: {request.method}")
-        print(f"Path: {request.path}")
-        print(f"Full Path: {request.get_full_path()}")
-        print(f"Host: {request.get_host()}")
-        print(f"Scheme: {request.scheme}")
-        print(f"META: {dict(request.META)}")
+        if DEBUG:
+            print(f"=== Incoming Request ===")
+            print(f"Method: {request.method}")
+            print(f"Path: {request.path}")
 
-        # Process the request
         response = self.get_response(request)
 
-        # Log response details
-        print(f"=== Response ===")
-        print(f"Status: {response.status_code}")
-        if hasattr(response, "url"):
-            print(f"Redirect URL: {response.url}")
-        print(f"========================")
+        if DEBUG:
+            print(f"=== Response: {response.status_code} ===")
 
         return response
 
@@ -91,7 +83,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_simplejwt",
     "corsheaders",
+    "django_ses",
     "django_extensions",
     "meals",
 ]
@@ -199,21 +193,54 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="http://localhost:3000,http://127.0.0.1:3000",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://localhost:3000,http://127.0.0.1:3000",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
+
 # REST Framework settings
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "meals.authentication.JWTCookieAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+}
+
+JWT_AUTH_COOKIE = "access_token"
+JWT_AUTH_REFRESH_COOKIE = "refresh_token"
+JWT_AUTH_COOKIE_SECURE = config("JWT_AUTH_COOKIE_SECURE", default=False, cast=bool)
+JWT_AUTH_COOKIE_SAMESITE = "Lax"
+
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+
+# Email via Amazon SES
+EMAIL_BACKEND = "django_ses.SESBackend"
+AWS_SES_REGION_NAME = config("AWS_SES_REGION_NAME", default="us-east-1")
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@mealplanner.com")
 
 print("Loaded settings")

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Typography, Avatar } from '@mui/material';
-import { RestaurantMenu } from '@mui/icons-material';
+import { Box, Typography, Avatar, IconButton, Tooltip } from '@mui/material';
+import { RestaurantMenu, LogoutOutlined } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors, semantic, radius } from '../../theme/tokens';
 
 const SIDEBAR_WIDTH = 240;
@@ -73,6 +74,7 @@ const NavItem = ({ item, active, onClick }) => {
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -163,18 +165,47 @@ const Sidebar = () => {
             color: colors.white,
             fontSize: 14,
             fontWeight: 700,
+            flexShrink: 0,
           }}
         >
-          Y
+          {user?.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
         </Avatar>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 600, color: semantic.textPrimary, lineHeight: 1.2 }}>
-            You
+        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+          <Typography
+            sx={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: semantic.textPrimary,
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.email}
           </Typography>
-          <Typography sx={{ fontSize: 12, color: semantic.textMuted, lineHeight: 1.2 }}>
-            Family meal planner
+          <Typography
+            sx={{
+              fontSize: 12,
+              color: semantic.textMuted,
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {user?.email}
           </Typography>
         </Box>
+        <Tooltip title="Sign out">
+          <IconButton
+            size="small"
+            onClick={logout}
+            sx={{ color: semantic.textMuted, '&:hover': { color: semantic.textSecondary } }}
+          >
+            <LogoutOutlined fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Box>
   );

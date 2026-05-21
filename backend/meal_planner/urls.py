@@ -35,6 +35,7 @@ def custom_404(request, exception):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/auth/", include("meals.auth_urls")),
     path("api/", include("meals.urls")),
     path("health", health_check, name="health_check"),
     path("hello/", hello_world, name="hello_world"),
