@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -6,8 +7,16 @@ from .models import MealPlan, MealSettings
 
 
 class MealSettingsDayToggleTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser@example.com',
+            email='testuser@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(user=self.user)
+
     def _create_plan_and_settings(self):
-        plan = MealPlan.objects.create(name='Plan')
+        plan = MealPlan.objects.create(name='Plan', user=self.user)
         settings = MealSettings.objects.create(meal_plan=plan)
         return plan, settings
 
