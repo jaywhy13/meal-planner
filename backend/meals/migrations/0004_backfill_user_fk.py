@@ -15,7 +15,7 @@ def assign_existing_rows_to_first_superuser(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("meals", "0003_add_user_fk_to_mealplan_food"),
+        ("meals", "0003_add_user_fk_to_mealplan"),
     ]
 
     operations = [

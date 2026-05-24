@@ -16,21 +16,13 @@ class MealPlan(models.Model):
 
 
 class Food(models.Model):
-    """Represents a food item that can be used in meal plans.
-
-    Rows with user=None are global seed foods visible to all users.
-    Rows with a user FK are private to that user.
-    """
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True, related_name="foods"
-    )
-    name = models.CharField(max_length=200)
+    """Represents a food item that can be used in meal plans."""
+    name = models.CharField(max_length=200, unique=True)
     category = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['name']
-        unique_together = [['user', 'name']]
 
     def __str__(self):
         return self.name

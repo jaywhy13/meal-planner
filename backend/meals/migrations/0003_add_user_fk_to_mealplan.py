@@ -22,24 +22,4 @@ class Migration(migrations.Migration):
                 to=settings.AUTH_USER_MODEL,
             ),
         ),
-        migrations.AddField(
-            model_name="food",
-            name="user",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="foods",
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AlterField(
-            model_name="food",
-            name="name",
-            field=models.CharField(max_length=200),
-        ),
-        migrations.AlterUniqueTogether(
-            name="food",
-            unique_together={("user", "name")},
-        ),
     ]
