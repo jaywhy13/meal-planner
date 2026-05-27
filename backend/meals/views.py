@@ -3,6 +3,8 @@ from datetime import date, timedelta
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Q
 from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
@@ -14,11 +16,18 @@ from .serializers import (
 
 class MealPlanViewSet(viewsets.ModelViewSet):
     queryset = MealPlan.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == 'list':
             return MealPlanListSerializer
         return MealPlanSerializer
+
+    def get_queryset(self):
+        return MealPlan.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['post'])
     def generate_meal_plan(self, request, pk=None):
@@ -75,7 +84,8 @@ class MealPlanViewSet(viewsets.ModelViewSet):
 class FoodViewSet(viewsets.ModelViewSet):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     @action(detail=False, methods=['get'])
     def search(self, request):
         """Search foods by name"""
@@ -92,19 +102,27 @@ class FoodViewSet(viewsets.ModelViewSet):
 class DailyMealViewSet(viewsets.ModelViewSet):
     queryset = DailyMeal.objects.all()
     serializer_class = DailyMealSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
-        queryset = DailyMeal.objects.all()
+        queryset = DailyMeal.objects.filter(meal_plan__user=self.request.user)
         meal_plan_id = self.request.query_params.get('meal_plan')
         if meal_plan_id:
             queryset = queryset.filter(meal_plan_id=meal_plan_id)
         return queryset
 
+    def perform_create(self, serializer):
+        meal_plan = serializer.validated_data.get("meal_plan")
+        if meal_plan and meal_plan.user != self.request.user:
+            raise PermissionDenied("You do not own this meal plan.")
+        serializer.save()
+
 
 class MealSuggestionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = MealSuggestion.objects.all()
     serializer_class = MealSuggestionSerializer
-    
+    permission_classes = [AllowAny]
+
     @action(detail=False, methods=['get'])
     def by_meal_type(self, request):
         """Get suggestions filtered by meal type"""
@@ -124,9 +142,10 @@ class MealSuggestionViewSet(viewsets.ReadOnlyModelViewSet):
 class MealSettingsViewSet(viewsets.ModelViewSet):
     queryset = MealSettings.objects.all()
     serializer_class = MealSettingsSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
-        queryset = MealSettings.objects.all()
+        queryset = MealSettings.objects.filter(meal_plan__user=self.request.user)
         meal_plan_id = self.request.query_params.get('meal_plan')
         if meal_plan_id:
             queryset = queryset.filter(meal_plan_id=meal_plan_id)

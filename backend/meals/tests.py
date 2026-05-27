@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.urls import reverse
 from rest_framework import status
@@ -11,7 +12,13 @@ from .serializers import DailyMealSerializer
 
 class GenerateMealPlanTests(APITestCase):
     def setUp(self):
-        self.plan = MealPlan.objects.create(name='Test Plan', start_date='2026-05-01')
+        self.user = User.objects.create_user(
+            username='testuser@example.com',
+            email='testuser@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(user=self.user)
+        self.plan = MealPlan.objects.create(name='Test Plan', start_date='2026-05-01', user=self.user)
 
     def _generate_url(self):
         return reverse('mealplan-generate-meal-plan', args=[self.plan.pk])
@@ -74,8 +81,16 @@ class GenerateMealPlanTests(APITestCase):
 
 
 class MealSettingsDayToggleTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser@example.com',
+            email='testuser@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(user=self.user)
+
     def _create_plan_and_settings(self):
-        plan = MealPlan.objects.create(name='Plan', start_date='2026-05-01')
+        plan = MealPlan.objects.create(name='Plan', start_date='2026-05-01', user=self.user)
         settings = MealSettings.objects.create(meal_plan=plan)
         return plan, settings
 
@@ -116,6 +131,14 @@ class MealSettingsDayToggleTests(APITestCase):
 
 
 class MealPlanStartDateTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='startdate@example.com',
+            email='startdate@example.com',
+            password='testpass123',
+        )
+        self.client.force_authenticate(user=self.user)
+
     def test_create_without_start_date_returns_400(self):
         url = reverse('mealplan-list')
         response = self.client.post(url, {'name': 'Test Plan'}, format='json')
@@ -129,14 +152,14 @@ class MealPlanStartDateTests(APITestCase):
         self.assertEqual(response.data['start_date'], '2026-05-01')
 
     def test_start_date_in_list_response(self):
-        MealPlan.objects.create(name='Plan A', start_date='2026-05-01')
+        MealPlan.objects.create(name='Plan A', start_date='2026-05-01', user=self.user)
         url = reverse('mealplan-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('start_date', response.data[0])
 
     def test_start_date_in_detail_response(self):
-        plan = MealPlan.objects.create(name='Plan A', start_date='2026-05-01')
+        plan = MealPlan.objects.create(name='Plan A', start_date='2026-05-01', user=self.user)
         url = reverse('mealplan-detail', args=[plan.pk])
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
