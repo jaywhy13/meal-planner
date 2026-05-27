@@ -6,6 +6,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './components/auth/LoginPage';
 import SignUpPage from './components/auth/SignUpPage';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
+import ResetPasswordPage from './components/auth/ResetPasswordPage';
 import MealPlansList from './components/MealPlansList';
 import MealPlanDetail from './components/MealPlanDetail';
 import FoodsManagement from './components/FoodsManagement';
@@ -23,6 +25,8 @@ function App() {
             {/* Public auth routes — no sidebar */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Protected app routes — with sidebar */}
             <Route
