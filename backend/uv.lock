@@ -27,6 +27,7 @@ dependencies = [
     { name = "django" },
     { name = "django-cors-headers" },
     { name = "django-extensions" },
+    { name = "django-ses" },
     { name = "django-storages" },
     { name = "djangorestframework" },
     { name = "djangorestframework-simplejwt" },
@@ -45,6 +46,7 @@ requires-dist = [
     { name = "django", specifier = "==4.2.24" },
     { name = "django-cors-headers", specifier = "==4.7.0" },
     { name = "django-extensions", specifier = "==4.1" },
+    { name = "django-ses", specifier = "==3.5.2" },
     { name = "django-storages", specifier = "==1.14.2" },
     { name = "djangorestframework", specifier = "==3.16.1" },
     { name = "djangorestframework-simplejwt", specifier = "==5.3.1" },
@@ -267,6 +269,20 @@ wheels = [
 ]
 
 [[package]]
+name = "django-ses"
+version = "3.5.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "boto3" },
+    { name = "django" },
+    { name = "pytz" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/17/d0/f041ced12a9adf209763a86dd76c713483570eeddcca282d03b415ea855a/django_ses-3.5.2.tar.gz", hash = "sha256:b6d94689bc15de02a11e84f05a5bf4a7895688e570c6f07c21698094debc6ced", size = 45578 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ff/34/78530467d595dc7eca527832d64d2f08b8aedd9e043e111548acb2380bf9/django_ses-3.5.2-py3-none-any.whl", hash = "sha256:90c68cc6ca3467893faa8499981c81ba8ff2bd3f3acb08c06423a4142d6a0fc6", size = 28834 },
+]
+
+[[package]]
 name = "django-storages"
 version = "1.14.2"
 source = { registry = "https://pypi.org/simple" }
@@ -442,6 +458,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e1/97/373dcd5844ec0ea5893e13c39a2c67e7537987ad8de3842fe078db4582fa/python-decouple-3.8.tar.gz", hash = "sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f", size = 9612 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a2/d4/9193206c4563ec771faf2ccf54815ca7918529fe81f6adb22ee6d0e06622/python_decouple-3.8-py3-none-any.whl", hash = "sha256:d0d45340815b25f4de59c974b855bb38d03151d81b037d9e3f463b0c9f8cbd66", size = 9947 },
+]
+
+[[package]]
+name = "pytz"
+version = "2026.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/46/dd499ec9038423421951e4fad73051febaa13d2df82b4064f87af8b8c0c3/pytz-2026.2.tar.gz", hash = "sha256:0e60b47b29f21574376f218fe21abc009894a2321ea16c6754f3cad6eb7cdd6a", size = 320861 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ec/dd/96da98f892250475bdf2328112d7468abdd4acc7b902b6af23f4ed958ea0/pytz-2026.2-py2.py3-none-any.whl", hash = "sha256:04156e608bee23d3792fd45c94ae47fae1036688e75032eea2e3bf0323d1f126", size = 510141 },
 ]
 
 [[package]]

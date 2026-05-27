@@ -16,6 +16,7 @@ from .auth_services import (
     AuthService,
     EmailAlreadyExists,
     InvalidCredentials,
+    InvalidResetToken,
 )
 
 
@@ -136,3 +137,46 @@ class TokenRefreshView(APIView):
                 {"error": "Invalid or expired refresh token."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request: Request) -> Response:
+        email: str = request.data.get("email", "").strip().lower()
+        if not email:
+            return Response(
+                {"error": "Email is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        auth_service.request_password_reset(email)
+
+        return Response(
+            {"detail": "If that email is registered, you'll receive a reset link shortly."}
+        )
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request: Request) -> Response:
+        uid: str = request.data.get("uid", "")
+        token: str = request.data.get("token", "")
+        new_password: str = request.data.get("password", "")
+
+        if not uid or not token or not new_password:
+            return Response(
+                {"error": "uid, token, and password are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            auth_service.reset_password(uid, token, new_password)
+        except InvalidResetToken:
+            return Response(
+                {"error": "This reset link is invalid or has expired."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"detail": "Password updated successfully."})

@@ -18,4 +18,5 @@ dependencies = [
     "django-storages==1.14.2",
     "django-extensions==4.1",
     "djangorestframework-simplejwt==5.3.1",
+    "django-ses==3.5.2",
 ]
