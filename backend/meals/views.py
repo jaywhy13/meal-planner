@@ -12,6 +12,11 @@ from .serializers import (
     MealPlanSerializer, MealPlanListSerializer, FoodSerializer,
     DailyMealSerializer, MealSuggestionSerializer, MealSettingsSerializer
 )
+from .services import DailyMealService, MealPlanService, MealSettingsService
+
+meal_plan_service = MealPlanService()
+daily_meal_service = DailyMealService()
+meal_settings_service = MealSettingsService()
 
 
 class MealPlanViewSet(viewsets.ModelViewSet):
@@ -24,7 +29,7 @@ class MealPlanViewSet(viewsets.ModelViewSet):
         return MealPlanSerializer
 
     def get_queryset(self):
-        return MealPlan.objects.filter(user=self.request.user)
+        return meal_plan_service.list_for_user(self.request.user.id)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -105,11 +110,11 @@ class DailyMealViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = DailyMeal.objects.filter(meal_plan__user=self.request.user)
         meal_plan_id = self.request.query_params.get('meal_plan')
-        if meal_plan_id:
-            queryset = queryset.filter(meal_plan_id=meal_plan_id)
-        return queryset
+        return daily_meal_service.list_for_user(
+            self.request.user.id,
+            meal_plan_id=int(meal_plan_id) if meal_plan_id else None,
+        )
 
     def perform_create(self, serializer):
         meal_plan = serializer.validated_data.get("meal_plan")
@@ -145,8 +150,8 @@ class MealSettingsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = MealSettings.objects.filter(meal_plan__user=self.request.user)
         meal_plan_id = self.request.query_params.get('meal_plan')
-        if meal_plan_id:
-            queryset = queryset.filter(meal_plan_id=meal_plan_id)
-        return queryset
+        return meal_settings_service.list_for_user(
+            self.request.user.id,
+            meal_plan_id=int(meal_plan_id) if meal_plan_id else None,
+        )
