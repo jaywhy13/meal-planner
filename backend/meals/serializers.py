@@ -61,14 +61,13 @@ class MealSettingsSerializer(serializers.ModelSerializer):
 class MealPlanSerializer(serializers.ModelSerializer):
     daily_meals = DailyMealSerializer(many=True, read_only=True)
     meal_settings = MealSettingsSerializer(read_only=True)
-    
+
     class Meta:
         model = MealPlan
-        fields = ['id', 'name', 'created_at', 'updated_at', 'daily_meals', 'meal_settings']
+        fields = ['id', 'name', 'start_date', 'created_at', 'updated_at', 'daily_meals', 'meal_settings']
 
 
 class MealPlanListSerializer(serializers.ModelSerializer):
-    """Simplified serializer for meal plan lists"""
     class Meta:
         model = MealPlan
-        fields = ['id', 'name', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'start_date', 'created_at', 'updated_at']
