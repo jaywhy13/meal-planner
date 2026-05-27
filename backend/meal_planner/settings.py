@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "django_ses",
     "django_extensions",
     "meals",
 ]
@@ -241,5 +242,14 @@ JWT_AUTH_COOKIE = "access_token"
 JWT_AUTH_REFRESH_COOKIE = "refresh_token"
 JWT_AUTH_COOKIE_SECURE = config("JWT_AUTH_COOKIE_SECURE", default=False, cast=bool)
 JWT_AUTH_COOKIE_SAMESITE = "Lax"
+
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3000")
+
+# Email via Amazon SES
+EMAIL_BACKEND = "django_ses.SESBackend"
+AWS_SES_REGION_NAME = config("AWS_SES_REGION_NAME", default="us-east-1")
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@mealplanner.com")
 
 print("Loaded settings")
