@@ -28,10 +28,10 @@ jobs:
         run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: uv pip install --system -r requirements.txt
+        run: uv sync --frozen --no-dev --no-install-project
 
       - name: Run migrations
-        run: python manage.py migrate
+        run: uv run python manage.py migrate
 
       - name: Run tests
-        run: python manage.py test meals
+        run: uv run python manage.py test meals

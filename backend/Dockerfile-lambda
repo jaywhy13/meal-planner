@@ -4,11 +4,14 @@ FROM public.ecr.aws/lambda/python:3.12
 # Set working directory
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Copy requirements file
-COPY requirements.txt .
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy dependency files
+COPY pyproject.toml uv.lock .
+
+# Install Python dependencies into the system environment (Lambda needs this)
+RUN uv pip install --system -r pyproject.toml
 
 # Copy function code
 COPY . ${LAMBDA_TASK_ROOT}
