@@ -18,9 +18,7 @@ from pathlib import Path
 from decouple import config
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -77,9 +75,7 @@ ALLOWED_HOSTS = config(
 
 # Add Heroku domain to allowed hosts
 if not DEBUG:
-    ALLOWED_HOSTS.extend(
-        [".herokuapp.com", ".lambda-url.us-east-1.on.aws", ".lambda-url.*.on.aws"]
-    )
+    ALLOWED_HOSTS.extend([".herokuapp.com", ".lambda-url.us-east-1.on.aws", ".lambda-url.*.on.aws"])
 
 
 # Application definition
@@ -150,7 +146,7 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": str(BASE_DIR / "db.sqlite3"),
         }
     }
 

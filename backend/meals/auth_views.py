@@ -113,6 +113,8 @@ class ProfileView(APIView):
 
     def get(self, request: Request) -> Response:
         user_data = auth_service.get_profile(request.user.id)
+        if user_data is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(asdict(user_data))
 
 
@@ -128,7 +130,7 @@ class TokenRefreshView(APIView):
             )
 
         try:
-            refresh = RefreshToken(refresh_token)
+            refresh = RefreshToken(token=refresh_token)  # type: ignore[arg-type]
             response = Response({"detail": "Token refreshed."}, status=status.HTTP_200_OK)
             _set_auth_cookies(response, refresh)
             return response
@@ -152,9 +154,7 @@ class ForgotPasswordView(APIView):
 
         auth_service.request_password_reset(email)
 
-        return Response(
-            {"detail": "If that email is registered, you'll receive a reset link shortly."}
-        )
+        return Response({"detail": "If that email is registered, you'll receive a reset link shortly."})
 
 
 class ResetPasswordView(APIView):

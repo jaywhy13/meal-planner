@@ -8,8 +8,7 @@ const MealSettingsPlaceholder = () => (
       Meal Settings
     </Typography>
     <Typography sx={{ color: semantic.textSecondary }}>
-      Global meal settings are coming soon. For now, settings live inside each
-      meal plan.
+      Global meal settings are coming soon. For now, settings live inside each meal plan.
     </Typography>
   </Box>
 );

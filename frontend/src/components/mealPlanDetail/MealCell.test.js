@@ -36,7 +36,7 @@ describe('MealCell filled state', () => {
         meal={mealWith([{ name: 'Oatmeal', category: 'Grain' }])}
         onAdd={noop}
         onEdit={noop}
-      />,
+      />
     );
     expect(screen.getByText('Oatmeal')).toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe('MealCell filled state', () => {
         ])}
         onAdd={noop}
         onEdit={noop}
-      />,
+      />
     );
     expect(screen.getByText('Eggs & Toast')).toBeInTheDocument();
   });
@@ -66,12 +66,12 @@ describe('MealCell filled state', () => {
         ])}
         onAdd={noop}
         onEdit={noop}
-      />,
+      />
     );
     expect(screen.getByText('Chicken & 3 more')).toBeInTheDocument();
   });
 
-  it('uses the first food\'s category to pick the emoji', () => {
+  it("uses the first food's category to pick the emoji", () => {
     render(
       <MealCell
         meal={mealWith([
@@ -80,7 +80,7 @@ describe('MealCell filled state', () => {
         ])}
         onAdd={noop}
         onEdit={noop}
-      />,
+      />
     );
     expect(screen.getByText('🍎')).toBeInTheDocument();
   });

@@ -21,12 +21,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import {
-  Add,
-  Edit,
-  Delete,
-  ArrowBack,
-} from '@mui/icons-material';
+import { Add, Edit, Delete, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { foodsAPI } from '../services/api';
 import { FOOD_CATEGORIES, getCategoryColor } from '../constants/foodCategories';
@@ -84,9 +79,7 @@ const FoodsManagement = () => {
         name: foodName.trim(),
         category: foodCategory || 'Other',
       });
-      setFoods(foods.map(food => 
-        food.id === editingFood.id ? response.data : food
-      ));
+      setFoods(foods.map((food) => (food.id === editingFood.id ? response.data : food)));
       resetForm();
       setOpenDialog(false);
     } catch (err) {
@@ -100,7 +93,7 @@ const FoodsManagement = () => {
 
     try {
       await foodsAPI.delete(foodId);
-      setFoods(foods.filter(food => food.id !== foodId));
+      setFoods(foods.filter((food) => food.id !== foodId));
     } catch (err) {
       setError('Failed to delete food');
       console.error('Error deleting food:', err);
@@ -191,21 +184,12 @@ const FoodsManagement = () => {
                     size="small"
                   />
                 </TableCell>
-                <TableCell>
-                  {new Date(food.created_at).toLocaleDateString()}
-                </TableCell>
+                <TableCell>{new Date(food.created_at).toLocaleDateString()}</TableCell>
                 <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleEditFood(food)}
-                  >
+                  <IconButton size="small" onClick={() => handleEditFood(food)}>
                     <Edit />
                   </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDeleteFood(food.id)}
-                  >
+                  <IconButton size="small" color="error" onClick={() => handleDeleteFood(food.id)}>
                     <Delete />
                   </IconButton>
                 </TableCell>
@@ -225,9 +209,7 @@ const FoodsManagement = () => {
 
       {/* Add/Edit Food Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {editingFood ? 'Edit Food' : 'Add New Food'}
-        </DialogTitle>
+        <DialogTitle>{editingFood ? 'Edit Food' : 'Add New Food'}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
@@ -237,7 +219,7 @@ const FoodsManagement = () => {
               fullWidth
               required
             />
-            
+
             <TextField
               select
               label="Category"
@@ -257,11 +239,7 @@ const FoodsManagement = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button 
-            onClick={handleSave} 
-            variant="contained"
-            disabled={!foodName.trim()}
-          >
+          <Button onClick={handleSave} variant="contained" disabled={!foodName.trim()}>
             {editingFood ? 'Update' : 'Create'}
           </Button>
         </DialogActions>

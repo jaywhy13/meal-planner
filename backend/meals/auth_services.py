@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from typing import cast
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
@@ -46,14 +48,15 @@ class AuthService:
             raise InvalidCredentials()
 
         authenticated_user: User | None = authenticate(
-            username=email[:150], password=password,
+            username=email[:150],
+            password=password,
         )
         if authenticated_user is None:
             raise InvalidCredentials()
 
         return AuthResult(
             user=user_data,
-            refresh=RefreshToken.for_user(authenticated_user),
+            refresh=cast(RefreshToken, RefreshToken.for_user(authenticated_user)),
         )
 
     def register(

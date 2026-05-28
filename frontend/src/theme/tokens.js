@@ -42,7 +42,8 @@ export const shadows = {
   ctaGlow: '0 8px 20px rgba(34, 197, 94, 0.4)',
 };
 
-export const fontFamily = '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+export const fontFamily =
+  '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
 export const typography = {
   display: { weight: 800, size: 32, lineHeight: 1.2 },
@@ -51,5 +52,11 @@ export const typography = {
   bodyLarge: { weight: 500, size: 16, lineHeight: 1.5 },
   body: { weight: 400, size: 14, lineHeight: 1.5 },
   caption: { weight: 400, size: 13, lineHeight: 1.4 },
-  label: { weight: 600, size: 10, lineHeight: 1.2, letterSpacing: '0.08em', textTransform: 'uppercase' },
+  label: {
+    weight: 600,
+    size: 10,
+    lineHeight: 1.2,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+  },
 };

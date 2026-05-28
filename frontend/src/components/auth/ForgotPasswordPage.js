@@ -61,7 +61,11 @@ const ForgotPasswordPage = () => {
     >
       <form onSubmit={handleSubmit}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {error && <Alert severity="error" sx={{ borderRadius: `${radius.r12}px` }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ borderRadius: `${radius.r12}px` }}>
+              {error}
+            </Alert>
+          )}
 
           <TextField
             label="Email"

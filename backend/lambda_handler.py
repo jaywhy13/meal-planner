@@ -34,7 +34,7 @@ application = get_asgi_application()
 print("Creating the handler now...")
 
 # Mangum translates Lambda HTTP events into ASGI requests for Django
-http_handler = Mangum(application, lifespan="off")
+http_handler = Mangum(application, lifespan="off")  # type: ignore[arg-type]
 
 print("Handler created successfully.")
 

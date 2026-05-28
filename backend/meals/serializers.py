@@ -5,41 +5,38 @@ from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
 class FoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food
-        fields = ['id', 'name', 'category', 'created_at']
+        fields = ["id", "name", "category", "created_at"]
 
 
 class MealSuggestionSerializer(serializers.ModelSerializer):
     foods = FoodSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = MealSuggestion
-        fields = ['id', 'name', 'description', 'foods', 'meal_type', 'is_healthy', 'created_at']
+        fields = ["id", "name", "description", "foods", "meal_type", "is_healthy", "created_at"]
 
 
 class DailyMealSerializer(serializers.ModelSerializer):
     foods = FoodSerializer(many=True, read_only=True)
     food_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Food.objects.all(),
-        source='foods',
-        many=True,
-        write_only=True
+        queryset=Food.objects.all(), source="foods", many=True, write_only=True
     )
     day_of_week = serializers.ReadOnlyField()
 
     class Meta:
         model = DailyMeal
-        fields = ['id', 'meal_plan', 'date', 'day_of_week', 'meal_type', 'foods', 'food_ids', 'notes']
-    
+        fields = ["id", "meal_plan", "date", "day_of_week", "meal_type", "foods", "food_ids", "notes"]
+
     def create(self, validated_data):
         print("Received data:", validated_data)
-        foods = validated_data.pop('foods', [])
+        foods = validated_data.pop("foods", [])
         print("After popping foods:", validated_data)
         daily_meal = DailyMeal.objects.create(**validated_data)
         daily_meal.foods.set(foods)
         return daily_meal
-    
+
     def update(self, instance, validated_data):
-        foods = validated_data.pop('foods', [])
+        foods = validated_data.pop("foods", [])
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -51,11 +48,20 @@ class MealSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = MealSettings
         fields = [
-            'id',
-            'breakfast_enabled', 'lunch_enabled', 'dinner_enabled', 'snack_enabled',
-            'monday_enabled', 'tuesday_enabled', 'wednesday_enabled', 'thursday_enabled',
-            'friday_enabled', 'saturday_enabled', 'sunday_enabled',
-            'created_at', 'updated_at',
+            "id",
+            "breakfast_enabled",
+            "lunch_enabled",
+            "dinner_enabled",
+            "snack_enabled",
+            "monday_enabled",
+            "tuesday_enabled",
+            "wednesday_enabled",
+            "thursday_enabled",
+            "friday_enabled",
+            "saturday_enabled",
+            "sunday_enabled",
+            "created_at",
+            "updated_at",
         ]
 
 
@@ -65,10 +71,10 @@ class MealPlanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MealPlan
-        fields = ['id', 'name', 'start_date', 'created_at', 'updated_at', 'daily_meals', 'meal_settings']
+        fields = ["id", "name", "start_date", "created_at", "updated_at", "daily_meals", "meal_settings"]
 
 
 class MealPlanListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MealPlan
-        fields = ['id', 'name', 'start_date', 'created_at', 'updated_at']
+        fields = ["id", "name", "start_date", "created_at", "updated_at"]

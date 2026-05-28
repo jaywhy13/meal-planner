@@ -11,7 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authService.getProfile()
+    authService
+      .getProfile()
       .then((profile) => setUser(profile))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));

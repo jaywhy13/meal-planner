@@ -4,7 +4,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("meals", "0002_add_meal_settings_day_toggles"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
