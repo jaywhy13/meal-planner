@@ -18,5 +18,4 @@ export const CATEGORY_COLORS = {
   Other: 'default',
 };
 
-export const getCategoryColor = (category) =>
-  CATEGORY_COLORS[category] || 'default';
+export const getCategoryColor = (category) => CATEGORY_COLORS[category] || 'default';

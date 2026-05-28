@@ -369,7 +369,9 @@ const MealPlanDetail = () => {
                   />
                 ))
               }
-              renderInput={(params) => <TextField {...params} label="Foods" placeholder="Select foods..." />}
+              renderInput={(params) => (
+                <TextField {...params} label="Foods" placeholder="Select foods..." />
+              )}
             />
 
             <Box sx={{ border: `1px dashed ${semantic.borderDefault}`, p: 2, borderRadius: 1 }}>
@@ -400,7 +402,12 @@ const MealPlanDetail = () => {
                     </option>
                   ))}
                 </TextField>
-                <Button variant="outlined" size="small" onClick={handleCreateNewFood} disabled={!newFoodName.trim()}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleCreateNewFood}
+                  disabled={!newFoodName.trim()}
+                >
                   Add
                 </Button>
               </Box>
@@ -425,7 +432,12 @@ const MealPlanDetail = () => {
           </Box>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-            <Button onClick={handleSaveMeal} variant="contained" color="primary" startIcon={<Save />}>
+            <Button
+              onClick={handleSaveMeal}
+              variant="contained"
+              color="primary"
+              startIcon={<Save />}
+            >
               Save
             </Button>
           </Box>

@@ -8,12 +8,7 @@ describe('getEmojiForFoods', () => {
   });
 
   it('uses the first food when multiple are provided', () => {
-    expect(
-      getEmojiForFoods([
-        { category: 'Protein' },
-        { category: 'Vegetable' },
-      ]),
-    ).toBe('🍗');
+    expect(getEmojiForFoods([{ category: 'Protein' }, { category: 'Vegetable' }])).toBe('🍗');
   });
 
   it.each([

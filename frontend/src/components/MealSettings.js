@@ -33,10 +33,10 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Try to get existing settings
       const response = await mealSettingsAPI.getByMealPlan(mealPlanId);
-      
+
       if (response.data.length > 0) {
         setMealSettings(response.data[0]);
       } else {
@@ -48,14 +48,14 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
           dinner_enabled: true,
           snack_enabled: true,
         };
-        
+
         const createResponse = await mealSettingsAPI.create(defaultSettings);
         setMealSettings(createResponse.data);
       }
     } catch (err) {
       console.error('Error fetching meal settings:', err);
       setError('Failed to load meal settings');
-      
+
       // Create default settings on error
       const defaultSettings = {
         meal_plan: mealPlanId,
@@ -71,9 +71,9 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
   };
 
   const handleToggleMealType = (mealType) => {
-    setMealSettings(prev => ({
+    setMealSettings((prev) => ({
       ...prev,
-      [`${mealType}_enabled`]: !prev[`${mealType}_enabled`]
+      [`${mealType}_enabled`]: !prev[`${mealType}_enabled`],
     }));
   };
 
@@ -81,13 +81,13 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
     try {
       setSaving(true);
       setError(null);
-      
+
       if (mealSettings.id) {
         await mealSettingsAPI.update(mealSettings.id, mealSettings);
       } else {
         await mealSettingsAPI.create(mealSettings);
       }
-      
+
       onClose();
     } catch (err) {
       console.error('Error saving meal settings:', err);
@@ -120,49 +120,46 @@ const MealSettings = ({ mealPlanId, open, onClose }) => {
         <Settings />
         Meal Settings
       </DialogTitle>
-      
+
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
-        
+
         <Box sx={{ mt: 2 }}>
           <Typography variant="h6" gutterBottom>
             Enable/Disable Meal Types
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Choose which meal types you want to include in your meal plan. 
-            Disabled meal types will not appear in the meal plan.
+            Choose which meal types you want to include in your meal plan. Disabled meal types will
+            not appear in the meal plan.
           </Typography>
-          
-          {mealSettings && mealTypes.map((mealType) => (
-            <FormControlLabel
-              key={mealType.key}
-              control={
-                <Switch
-                  checked={mealSettings[`${mealType.key}_enabled`]}
-                  onChange={() => handleToggleMealType(mealType.key)}
-                  color="primary"
-                />
-              }
-              label={mealType.label}
-              sx={{ display: 'block', mb: 1 }}
-            />
-          ))}
+
+          {mealSettings &&
+            mealTypes.map((mealType) => (
+              <FormControlLabel
+                key={mealType.key}
+                control={
+                  <Switch
+                    checked={mealSettings[`${mealType.key}_enabled`]}
+                    onChange={() => handleToggleMealType(mealType.key)}
+                    color="primary"
+                  />
+                }
+                label={mealType.label}
+                sx={{ display: 'block', mb: 1 }}
+              />
+            ))}
         </Box>
       </DialogContent>
-      
+
       <DialogActions>
         <Button onClick={onClose} disabled={saving}>
           Cancel
         </Button>
-        <Button 
-          onClick={handleSave} 
-          variant="contained" 
-          disabled={saving}
-        >
+        <Button onClick={handleSave} variant="contained" disabled={saving}>
           {saving ? 'Saving...' : 'Save Settings'}
         </Button>
       </DialogActions>

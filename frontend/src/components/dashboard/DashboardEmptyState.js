@@ -81,8 +81,8 @@ const DashboardEmptyState = ({ onCreate }) => (
         variant="body1"
         sx={{ color: semantic.textSecondary, mb: 4, maxWidth: 440, mx: 'auto' }}
       >
-        Plan your family's meals for the week, discover new recipes, and make
-        grocery shopping a breeze. Let's get started!
+        Plan your family's meals for the week, discover new recipes, and make grocery shopping a
+        breeze. Let's get started!
       </Typography>
 
       <Button
@@ -101,9 +101,7 @@ const DashboardEmptyState = ({ onCreate }) => (
         + Create My First Meal Plan
       </Button>
 
-      <Typography
-        sx={{ mt: 3, fontSize: 12, color: semantic.textMuted }}
-      >
+      <Typography sx={{ mt: 3, fontSize: 12, color: semantic.textMuted }}>
         ✨ Tip: You can plan up to 7 days at once and reuse plans from previous weeks.
       </Typography>
     </Card>

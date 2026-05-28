@@ -38,7 +38,9 @@ const MealPlansList = () => {
       setError(null);
     } catch (err) {
       if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
-        setError('Cannot connect to backend. Please make sure the backend is running on port 8000.');
+        setError(
+          'Cannot connect to backend. Please make sure the backend is running on port 8000.'
+        );
       } else {
         setError('Failed to fetch meal plans: ' + (err.response?.data?.detail || err.message));
       }

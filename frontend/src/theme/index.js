@@ -1,12 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-import {
-  colors,
-  semantic,
-  radius,
-  shadows,
-  fontFamily,
-  typography as t,
-} from './tokens';
+import { colors, semantic, radius, shadows, fontFamily, typography as t } from './tokens';
 
 const theme = createTheme({
   palette: {
@@ -40,12 +33,24 @@ const theme = createTheme({
 
   typography: {
     fontFamily,
-    h1: { fontWeight: t.display.weight, fontSize: t.display.size, lineHeight: t.display.lineHeight },
+    h1: {
+      fontWeight: t.display.weight,
+      fontSize: t.display.size,
+      lineHeight: t.display.lineHeight,
+    },
     h2: { fontWeight: t.h1.weight, fontSize: t.h1.size, lineHeight: t.h1.lineHeight },
     h3: { fontWeight: t.h2.weight, fontSize: t.h2.size, lineHeight: t.h2.lineHeight },
-    body1: { fontWeight: t.bodyLarge.weight, fontSize: t.bodyLarge.size, lineHeight: t.bodyLarge.lineHeight },
+    body1: {
+      fontWeight: t.bodyLarge.weight,
+      fontSize: t.bodyLarge.size,
+      lineHeight: t.bodyLarge.lineHeight,
+    },
     body2: { fontWeight: t.body.weight, fontSize: t.body.size, lineHeight: t.body.lineHeight },
-    caption: { fontWeight: t.caption.weight, fontSize: t.caption.size, lineHeight: t.caption.lineHeight },
+    caption: {
+      fontWeight: t.caption.weight,
+      fontSize: t.caption.size,
+      lineHeight: t.caption.lineHeight,
+    },
     overline: {
       fontWeight: t.label.weight,
       fontSize: t.label.size,

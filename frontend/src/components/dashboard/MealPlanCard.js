@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Card,
-  Typography,
-  Button,
-  IconButton,
-  Menu,
-  MenuItem,
-} from '@mui/material';
+import { Box, Card, Typography, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { RestaurantMenu, MoreVert, Delete } from '@mui/icons-material';
 import { colors, semantic, radius, shadows } from '../../theme/tokens';
 
@@ -82,11 +74,7 @@ const MealPlanCard = ({ plan, onView, onDelete }) => {
         >
           <MoreVert fontSize="small" />
         </IconButton>
-        <Menu
-          anchorEl={menuAnchor}
-          open={Boolean(menuAnchor)}
-          onClose={() => setMenuAnchor(null)}
-        >
+        <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
           <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <Delete fontSize="small" sx={{ mr: 1 }} />
             Delete

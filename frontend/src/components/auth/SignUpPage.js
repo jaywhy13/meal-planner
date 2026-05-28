@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Alert, Grid, InputAdornment, IconButton } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Grid,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -48,7 +57,11 @@ const SignUpPage = () => {
     >
       <form onSubmit={handleSubmit}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {error && <Alert severity="error" sx={{ borderRadius: `${radius.r12}px` }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ borderRadius: `${radius.r12}px` }}>
+              {error}
+            </Alert>
+          )}
 
           <Grid container spacing={1.5}>
             <Grid item xs={6}>
@@ -100,7 +113,11 @@ const SignUpPage = () => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={() => setShowPassword((v) => !v)} edge="end" size="small">
-                    {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
                   </IconButton>
                 </InputAdornment>
               ),
