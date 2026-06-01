@@ -2282,133 +2282,349 @@
         </p>
       </div>
 
-      <!-- Illustration: the existing chaos -->
+      <!-- Illustration: the planning chaos, with the same parent character at the center -->
       <div class="chaos-illustration reveal" data-parallax="0.04">
-        <svg viewBox="0 0 880 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <!-- Soft background blob -->
-          <ellipse cx="440" cy="200" rx="380" ry="140" fill="#FEF3C7" opacity="0.7"/>
+        <svg viewBox="0 0 920 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <radialGradient id="chaos-bg" cx="40%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#FEF3C7" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#FBF5E6" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
 
-          <!-- Desk surface (subtle line) -->
-          <line x1="40" y1="300" x2="840" y2="300" stroke="#E5DDC2" stroke-width="2" stroke-dasharray="6,8"/>
+          <!-- ATMOSPHERE -->
+          <ellipse cx="460" cy="220" rx="420" ry="180" fill="url(#chaos-bg)"/>
+          <circle cx="120" cy="80" r="44" fill="#FBBF24" opacity="0.2"/>
+          <circle cx="820" cy="340" r="60" fill="#FB923C" opacity="0.18"/>
 
-          <!-- Laptop with spreadsheet -->
-          <g transform="translate(330, 130)">
-            <rect x="0" y="14" width="220" height="140" rx="6" fill="#1A1612"/>
-            <rect x="6" y="20" width="208" height="128" rx="3" fill="#FEFAEE"/>
-            <!-- Spreadsheet grid -->
-            <g stroke="#E5DDC2" stroke-width="1">
-              <line x1="6" y1="40" x2="214" y2="40"/>
-              <line x1="6" y1="56" x2="214" y2="56"/>
-              <line x1="6" y1="72" x2="214" y2="72"/>
-              <line x1="6" y1="88" x2="214" y2="88"/>
+          <!-- ─── DESK SURFACE ─── -->
+          <ellipse cx="460" cy="395" rx="380" ry="10" fill="#1A1612" opacity="0.06"/>
+          <line x1="60" y1="378" x2="860" y2="378" stroke="#D9C9A0" stroke-width="2.5"/>
+
+          <!-- ─── STICKY NOTE: LEFT (yellow with crossed-out list) ─── -->
+          <g transform="translate(40, 36) rotate(-7)">
+            <rect width="120" height="120" fill="#FBBF24" filter="drop-shadow(0 8px 14px rgba(0,0,0,0.15))"/>
+            <rect x="0" y="0" width="120" height="14" fill="#E8A912"/>
+            <text x="14" y="36" font-family="Fraunces, serif" font-size="14" fill="#1A1612" font-style="italic">Meal ideas</text>
+            <line x1="14" y1="46" x2="106" y2="46" stroke="#1A1612" stroke-width="1" opacity="0.5"/>
+            <text x="14" y="62" font-family="Fraunces, serif" font-size="11" fill="#1A1612" opacity="0.85">- chicken pot pie</text>
+            <line x1="14" y1="60" x2="100" y2="60" stroke="#EF4444" stroke-width="1.5"/>
+            <text x="14" y="78" font-family="Fraunces, serif" font-size="11" fill="#1A1612" opacity="0.85">- veg stir-fry?</text>
+            <text x="14" y="94" font-family="Fraunces, serif" font-size="11" fill="#1A1612" opacity="0.85">- meatballs</text>
+            <line x1="14" y1="92" x2="78" y2="92" stroke="#EF4444" stroke-width="1.5"/>
+            <text x="14" y="110" font-family="Fraunces, serif" font-size="11" fill="#1A1612" opacity="0.85">- salmon?</text>
+          </g>
+
+          <!-- ─── PINTEREST RECIPE CARD ─── -->
+          <g transform="translate(72, 220) rotate(6)">
+            <rect width="140" height="160" rx="6" fill="#FFFFFF" stroke="#E5DDC2" stroke-width="1.5" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.1))"/>
+            <!-- Recipe photo (food blob) -->
+            <rect x="0" y="0" width="140" height="80" fill="#FB923C"/>
+            <ellipse cx="70" cy="50" rx="40" ry="20" fill="#C8631E"/>
+            <circle cx="50" cy="46" r="6" fill="#FBBF24"/>
+            <circle cx="68" cy="42" r="5" fill="#FEF3C7"/>
+            <circle cx="86" cy="48" r="5" fill="#22C55E"/>
+            <!-- Recipe info -->
+            <text x="10" y="100" font-family="JetBrains Mono, monospace" font-size="7" fill="#EF4444" letter-spacing="1">PINTEREST</text>
+            <text x="10" y="118" font-family="Fraunces, serif" font-size="13" fill="#1A1612" font-style="italic">Sheet-pan</text>
+            <text x="10" y="132" font-family="Fraunces, serif" font-size="13" fill="#1A1612" font-style="italic">chicken</text>
+            <line x1="10" y1="142" x2="130" y2="142" stroke="#E5DDC2" stroke-width="1"/>
+            <text x="10" y="154" font-family="Plus Jakarta Sans, sans-serif" font-size="8" fill="#8B8478">Saved 14 days ago</text>
+            <!-- Push pin -->
+            <circle cx="120" cy="14" r="6" fill="#EF4444"/>
+            <circle cx="120" cy="14" r="2" fill="#1A1612" opacity="0.4"/>
+          </g>
+
+          <!-- ─── LAPTOP WITH SPREADSHEET ─── -->
+          <g transform="translate(360, 196)">
+            <!-- Laptop screen bezel -->
+            <rect x="0" y="0" width="220" height="148" rx="8" fill="#1A1612"/>
+            <rect x="6" y="6" width="208" height="136" rx="4" fill="#FEFAEE"/>
+            <!-- Top menu bar -->
+            <rect x="6" y="6" width="208" height="14" fill="#F4EBCD"/>
+            <circle cx="14" cy="13" r="2" fill="#EF4444"/>
+            <circle cx="20" cy="13" r="2" fill="#FBBF24"/>
+            <circle cx="26" cy="13" r="2" fill="#22C55E"/>
+            <text x="105" y="16" font-family="JetBrains Mono, monospace" font-size="6" fill="#8B8478" text-anchor="middle">meals.xlsx</text>
+            <!-- Spreadsheet header (green tab) -->
+            <rect x="6" y="20" width="208" height="14" fill="#22C55E"/>
+            <text x="14" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">A</text>
+            <text x="48" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">MON</text>
+            <text x="80" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">TUE</text>
+            <text x="112" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">WED</text>
+            <text x="144" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">THU</text>
+            <text x="176" y="30" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">FRI</text>
+            <!-- Grid lines -->
+            <g stroke="#E5DDC2" stroke-width="0.8">
+              <line x1="6" y1="50" x2="214" y2="50"/>
+              <line x1="6" y1="68" x2="214" y2="68"/>
+              <line x1="6" y1="86" x2="214" y2="86"/>
               <line x1="6" y1="104" x2="214" y2="104"/>
-              <line x1="6" y1="120" x2="214" y2="120"/>
-              <line x1="6" y1="136" x2="214" y2="136"/>
-              <line x1="40" y1="20" x2="40" y2="148"/>
-              <line x1="80" y1="20" x2="80" y2="148"/>
-              <line x1="120" y1="20" x2="120" y2="148"/>
-              <line x1="160" y1="20" x2="160" y2="148"/>
+              <line x1="6" y1="122" x2="214" y2="122"/>
+              <line x1="40" y1="34" x2="40" y2="142"/>
+              <line x1="72" y1="34" x2="72" y2="142"/>
+              <line x1="104" y1="34" x2="104" y2="142"/>
+              <line x1="136" y1="34" x2="136" y2="142"/>
+              <line x1="168" y1="34" x2="168" y2="142"/>
             </g>
-            <!-- Header row -->
-            <rect x="6" y="20" width="208" height="20" fill="#22C55E" opacity="0.85"/>
-            <!-- A few colored cells (meal entries) -->
-            <rect x="40" y="56" width="40" height="16" fill="#FEF3C7"/>
-            <rect x="80" y="72" width="40" height="16" fill="#FEF3C7"/>
-            <rect x="120" y="88" width="40" height="16" fill="#FEF3C7"/>
-            <rect x="40" y="104" width="40" height="16" fill="#FEF3C7"/>
-            <!-- Squiggly text lines on cells -->
-            <line x1="44" y1="64" x2="74" y2="64" stroke="#1A1612" stroke-width="1.5" opacity="0.4"/>
-            <line x1="84" y1="80" x2="114" y2="80" stroke="#1A1612" stroke-width="1.5" opacity="0.4"/>
-            <line x1="124" y1="96" x2="154" y2="96" stroke="#1A1612" stroke-width="1.5" opacity="0.4"/>
-            <line x1="44" y1="112" x2="74" y2="112" stroke="#1A1612" stroke-width="1.5" opacity="0.4"/>
+            <!-- Row labels -->
+            <text x="14" y="46" font-family="JetBrains Mono, monospace" font-size="6" fill="#8B8478">B</text>
+            <text x="14" y="64" font-family="JetBrains Mono, monospace" font-size="6" fill="#8B8478">L</text>
+            <text x="14" y="82" font-family="JetBrains Mono, monospace" font-size="6" fill="#8B8478">D</text>
+            <text x="14" y="100" font-family="JetBrains Mono, monospace" font-size="6" fill="#8B8478">S</text>
+            <!-- Meal entries (highlighted cells) -->
+            <rect x="40" y="52" width="32" height="14" fill="#FEF3C7"/>
+            <text x="44" y="62" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">eggs</text>
+            <rect x="72" y="70" width="32" height="14" fill="#FEF3C7"/>
+            <text x="76" y="80" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">soup</text>
+            <rect x="104" y="88" width="32" height="14" fill="#FEF3C7"/>
+            <text x="108" y="98" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">pasta</text>
+            <rect x="136" y="70" width="32" height="14" fill="#FEF3C7"/>
+            <text x="140" y="80" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">salad</text>
+            <!-- Red cell with question -->
+            <rect x="168" y="88" width="32" height="14" fill="#FCA5A5"/>
+            <text x="172" y="98" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">???</text>
+            <rect x="40" y="106" width="32" height="14" fill="#FEF3C7"/>
+            <text x="44" y="116" font-family="Fraunces, serif" font-size="7" fill="#1A1612" font-style="italic">tacos</text>
             <!-- Laptop base -->
-            <path d="M -16 154 L 236 154 L 224 170 L -4 170 Z" fill="#1A1612"/>
-            <rect x="100" y="158" width="20" height="3" rx="1.5" fill="#4A4138"/>
+            <path d="M -16 148 L 236 148 L 224 168 L -4 168 Z" fill="#1A1612"/>
+            <rect x="98" y="153" width="24" height="3" rx="1.5" fill="#4A4138"/>
+            <!-- Laptop shadow -->
+            <ellipse cx="110" cy="172" rx="120" ry="4" fill="#1A1612" opacity="0.15"/>
           </g>
 
-          <!-- Sticky notes scattered -->
-          <g transform="translate(120, 90) rotate(-8)">
-            <rect width="90" height="90" fill="#FBBF24" filter="drop-shadow(0 6px 10px rgba(0,0,0,0.12))"/>
-            <line x1="14" y1="22" x2="76" y2="22" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-            <line x1="14" y1="36" x2="64" y2="36" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-            <line x1="14" y1="50" x2="72" y2="50" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-            <line x1="14" y1="64" x2="56" y2="64" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-          </g>
-
-          <g transform="translate(620, 70) rotate(12)">
-            <rect width="100" height="80" fill="#FB923C" filter="drop-shadow(0 6px 10px rgba(0,0,0,0.12))"/>
-            <text x="14" y="32" font-family="Fraunces, serif" font-size="16" fill="#1A1612" font-style="italic">Tacos!</text>
-            <line x1="14" y1="44" x2="86" y2="44" stroke="#1A1612" stroke-width="1.5" opacity="0.5"/>
-            <line x1="14" y1="56" x2="70" y2="56" stroke="#1A1612" stroke-width="1.5" opacity="0.5"/>
-            <line x1="14" y1="68" x2="78" y2="68" stroke="#1A1612" stroke-width="1.5" opacity="0.5"/>
-          </g>
-
-          <g transform="translate(720, 200) rotate(-6)">
-            <rect width="80" height="80" fill="#EF4444" filter="drop-shadow(0 6px 10px rgba(0,0,0,0.12))"/>
-            <circle cx="20" cy="22" r="4" fill="#1A1612"/>
-            <line x1="32" y1="22" x2="66" y2="22" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-            <circle cx="20" cy="38" r="4" fill="#1A1612"/>
-            <line x1="32" y1="38" x2="60" y2="38" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-            <circle cx="20" cy="54" r="4" fill="#1A1612"/>
-            <line x1="32" y1="54" x2="66" y2="54" stroke="#1A1612" stroke-width="1.5" opacity="0.6"/>
-          </g>
-
-          <!-- Handwritten paper meal list -->
-          <g transform="translate(40, 200) rotate(-4)">
-            <rect width="160" height="120" fill="#FEFAEE" filter="drop-shadow(0 8px 14px rgba(0,0,0,0.1))"/>
-            <text x="80" y="24" font-family="Fraunces, serif" font-size="13" text-anchor="middle" fill="#1A1612" font-style="italic">This Week</text>
-            <line x1="14" y1="34" x2="146" y2="34" stroke="#EF4444" stroke-width="1.5"/>
-            <text x="14" y="52" font-family="Fraunces, serif" font-size="11" fill="#4A4138">M &mdash; pasta?</text>
-            <text x="14" y="68" font-family="Fraunces, serif" font-size="11" fill="#4A4138">T &mdash; chicken</text>
-            <text x="14" y="84" font-family="Fraunces, serif" font-size="11" fill="#4A4138">W &mdash; tacos</text>
-            <text x="14" y="100" font-family="Fraunces, serif" font-size="11" fill="#4A4138">Th &mdash; ???</text>
-            <text x="14" y="116" font-family="Fraunces, serif" font-size="11" fill="#4A4138">F &mdash; pizza</text>
-          </g>
-
-          <!-- Pinned recipe card -->
-          <g transform="translate(580, 230) rotate(8)">
-            <rect width="120" height="90" rx="4" fill="#FFFFFF" stroke="#E5DDC2" stroke-width="1" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.08))"/>
-            <rect x="0" y="0" width="120" height="40" fill="#FB923C"/>
-            <text x="12" y="58" font-family="Fraunces, serif" font-size="11" fill="#1A1612" font-style="italic">Pinterest</text>
-            <text x="12" y="74" font-family="Fraunces, serif" font-size="10" fill="#4A4138">Sheet-pan dinner</text>
-          </g>
-
-          <!-- Coffee mug -->
-          <g transform="translate(800, 270)">
-            <path d="M 0 0 L 0 30 Q 0 36 6 36 L 30 36 Q 36 36 36 30 L 36 0 Z" fill="#22C55E"/>
-            <path d="M 36 10 Q 48 10 48 18 Q 48 26 36 26" stroke="#22C55E" stroke-width="3" fill="none"/>
-            <ellipse cx="18" cy="0" rx="18" ry="4" fill="#16A34A"/>
+          <!-- ─── COFFEE MUG ─── -->
+          <g transform="translate(280, 296)">
+            <ellipse cx="22" cy="60" rx="26" ry="3" fill="#1A1612" opacity="0.15"/>
+            <path d="M 0 0 L 0 50 Q 0 60 12 60 L 32 60 Q 44 60 44 50 L 44 0 Z" fill="#22C55E"/>
+            <path d="M 44 16 Q 60 16 60 28 Q 60 40 44 40" stroke="#22C55E" stroke-width="4.5" fill="none"/>
+            <ellipse cx="22" cy="0" rx="22" ry="5" fill="#16A34A"/>
+            <ellipse cx="22" cy="-2" rx="18" ry="3" fill="#3A2A1E"/>
+            <!-- Mug pattern -->
+            <text x="22" y="40" font-family="Fraunces, serif" font-size="11" fill="#FEFAEE" text-anchor="middle" font-style="italic">mom</text>
             <!-- Steam -->
-            <path d="M 10 -10 Q 14 -16 10 -22 Q 6 -28 10 -34" stroke="#A8B89F" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
-            <path d="M 22 -8 Q 26 -14 22 -20 Q 18 -26 22 -32" stroke="#A8B89F" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 12 -10 Q 16 -18 12 -26 Q 8 -34 12 -42"
+                  stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6">
+              <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 26 -8 Q 30 -16 26 -24 Q 22 -32 26 -40"
+                  stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5">
+              <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+            </path>
           </g>
 
-          <!-- Parent figure leaning in -->
-          <g transform="translate(220, 150)">
-            <!-- Head -->
-            <circle cx="60" cy="50" r="34" fill="#E6B89C"/>
-            <!-- Hair: messy bun -->
-            <ellipse cx="60" cy="28" rx="32" ry="22" fill="#3A2A1E"/>
-            <circle cx="56" cy="14" r="14" fill="#3A2A1E"/>
-            <!-- Strand falling -->
-            <path d="M 32 40 Q 26 56 32 70" stroke="#3A2A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <!-- Eyes -->
-            <circle cx="50" cy="52" r="2.5" fill="#1A1612"/>
-            <circle cx="72" cy="52" r="2.5" fill="#1A1612"/>
-            <!-- Eyebrows: slightly concerned -->
-            <path d="M 44 44 Q 50 42 56 44" stroke="#1A1612" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <path d="M 66 44 Q 72 42 78 44" stroke="#1A1612" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <!-- Small smile -->
-            <path d="M 52 64 Q 60 70 68 64" stroke="#1A1612" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <!-- Body / sweater -->
-            <path d="M 22 90 L 18 180 L 102 180 L 98 90 Q 88 84 60 84 Q 32 84 22 90 Z" fill="#22C55E"/>
-            <!-- Sweater neckline -->
-            <path d="M 50 84 Q 60 90 70 84" stroke="#16A34A" stroke-width="2" fill="none"/>
+          <!-- ─── HANDWRITTEN PAPER LIST ─── -->
+          <g transform="translate(620, 252) rotate(8)">
+            <rect width="170" height="130" fill="#FEFAEE" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.1))"/>
+            <text x="85" y="22" font-family="Fraunces, serif" font-size="14" text-anchor="middle" fill="#1A1612" font-style="italic">This Week</text>
+            <line x1="16" y1="32" x2="154" y2="32" stroke="#EF4444" stroke-width="1.5"/>
+            <text x="16" y="50" font-family="Fraunces, serif" font-size="11" fill="#4A4138">M &mdash; pasta?</text>
+            <text x="16" y="66" font-family="Fraunces, serif" font-size="11" fill="#4A4138">T &mdash; chicken</text>
+            <text x="16" y="82" font-family="Fraunces, serif" font-size="11" fill="#4A4138">W &mdash; tacos</text>
+            <text x="16" y="98" font-family="Fraunces, serif" font-size="11" fill="#4A4138">Th &mdash; ???</text>
+            <text x="16" y="114" font-family="Fraunces, serif" font-size="11" fill="#4A4138">F &mdash; pizza</text>
           </g>
 
-          <!-- Question marks / overwhelmed marks -->
-          <text x="210" y="120" font-family="Fraunces, serif" font-size="36" fill="#EF4444" font-style="italic" opacity="0.7">?</text>
-          <text x="450" y="80" font-family="Fraunces, serif" font-size="28" fill="#FBBF24" font-style="italic" opacity="0.85">!</text>
+          <!-- ─── ORANGE STICKY NOTE TOP-RIGHT ─── -->
+          <g transform="translate(720, 50) rotate(10)">
+            <rect width="110" height="90" fill="#FB923C" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.15))"/>
+            <text x="16" y="34" font-family="Fraunces, serif" font-size="16" fill="#1A1612" font-style="italic">Tacos!</text>
+            <text x="16" y="50" font-family="Fraunces, serif" font-size="9" fill="#1A1612">- ground beef</text>
+            <text x="16" y="62" font-family="Fraunces, serif" font-size="9" fill="#1A1612">- shells</text>
+            <text x="16" y="74" font-family="Fraunces, serif" font-size="9" fill="#1A1612">- avocado</text>
+          </g>
+
+          <!-- ─── PARENT CHARACTER (centered, looking at laptop) ─── -->
+          <g transform="translate(190, 88)">
+
+            <!-- HAIR BACK -->
+            <path d="M 28 50
+                     C 18 70 14 100 22 130
+                     C 28 150 38 158 46 162
+                     L 46 110
+                     C 40 90 38 70 44 54
+                     C 60 38 84 32 102 38
+                     C 122 44 138 58 138 78
+                     C 138 96 132 110 124 116
+                     L 124 162
+                     C 132 158 142 150 148 130
+                     C 156 100 152 70 142 50
+                     C 120 28 88 22 64 28
+                     C 46 32 32 40 28 50 Z"
+                  fill="#2E2018"/>
+
+            <!-- NECK -->
+            <path d="M 70 142 L 68 162 L 96 162 L 94 142 Z" fill="#C68B5D"/>
+            <path d="M 68 158 L 70 162 L 94 162 L 96 158 Z" fill="#A06E48" opacity="0.4"/>
+
+            <!-- FACE -->
+            <path d="M 84 46
+                     C 106 46 122 58 126 78
+                     C 128 94 126 110 118 122
+                     C 110 132 98 138 84 138
+                     C 70 138 58 132 50 122
+                     C 42 110 40 94 42 78
+                     C 46 58 62 46 84 46 Z"
+                  fill="#C68B5D"/>
+
+            <!-- Face shadow -->
+            <path d="M 116 78 C 128 94 126 110 118 122 C 112 130 104 134 96 136 C 110 130 116 110 116 88 C 116 84 116 80 116 78 Z"
+                  fill="#A06E48" opacity="0.3"/>
+
+            <!-- EARS -->
+            <ellipse cx="42" cy="86" rx="5" ry="9" fill="#C68B5D"/>
+            <ellipse cx="126" cy="86" rx="5" ry="9" fill="#C68B5D"/>
+
+            <!-- HAIR FRONT -->
+            <path d="M 48 60
+                     C 54 50 64 44 76 44
+                     C 86 44 92 50 96 56
+                     C 100 50 108 46 116 48
+                     C 124 50 130 56 130 66
+                     C 122 62 112 60 104 64
+                     C 98 66 94 70 92 74
+                     C 88 68 82 64 76 64
+                     C 66 62 54 64 48 70 Z"
+                  fill="#3A2A1E"/>
+            <circle cx="58" cy="56" r="6" fill="#3A2A1E"/>
+            <circle cx="72" cy="50" r="6" fill="#3A2A1E"/>
+            <circle cx="88" cy="52" r="6" fill="#3A2A1E"/>
+            <circle cx="106" cy="52" r="6" fill="#3A2A1E"/>
+            <circle cx="120" cy="58" r="6" fill="#3A2A1E"/>
+
+            <!-- MESSY BUN -->
+            <ellipse cx="84" cy="28" rx="28" ry="16" fill="#3A2A1E"/>
+            <circle cx="72" cy="20" r="11" fill="#2E2018"/>
+            <circle cx="92" cy="22" r="9" fill="#2E2018"/>
+            <ellipse cx="84" cy="40" rx="16" ry="3" fill="#1A1612"/>
+            <ellipse cx="84" cy="42" rx="12" ry="2" fill="#5C2918"/>
+            <!-- Pencil stuck in bun -->
+            <rect x="98" y="14" width="3" height="22" fill="#FBBF24" transform="rotate(35 99 25)"/>
+            <path d="M 105 8 L 109 4 L 113 8 Z" fill="#1A1612" transform="rotate(35 110 6)"/>
+
+            <!-- LOOSE STRANDS -->
+            <path d="M 46 100 C 38 110 34 120 36 132"
+                  stroke="#3A2A1E" stroke-width="4"
+                  fill="none" stroke-linecap="round"/>
+            <path d="M 126 98 C 132 108 134 118 130 130"
+                  stroke="#3A2A1E" stroke-width="3"
+                  fill="none" stroke-linecap="round"/>
+
+            <!-- EYEBROWS (slightly raised, concerned but determined) -->
+            <path d="M 58 86 C 64 80 70 80 76 86"
+                  stroke="#1A1612" stroke-width="3.5"
+                  fill="none" stroke-linecap="round"/>
+            <path d="M 92 86 C 98 80 104 80 110 86"
+                  stroke="#1A1612" stroke-width="3.5"
+                  fill="none" stroke-linecap="round"/>
+
+            <!-- EYES (focused, looking forward/down at the laptop) -->
+            <path d="M 58 96 C 64 92 72 92 76 96 C 72 100 64 100 58 98 Z" fill="#FEFAEE"/>
+            <ellipse cx="69" cy="97" rx="4" ry="4.5" fill="#3A2A1E"/>
+            <circle cx="69" cy="98" r="2" fill="#1A1612"/>
+            <circle cx="70.5" cy="96" r="1" fill="#FEFAEE"/>
+            <path d="M 92 96 C 98 92 106 92 110 96 C 106 100 98 100 92 98 Z" fill="#FEFAEE"/>
+            <ellipse cx="100" cy="97" rx="4" ry="4.5" fill="#3A2A1E"/>
+            <circle cx="100" cy="98" r="2" fill="#1A1612"/>
+            <circle cx="101.5" cy="96" r="1" fill="#FEFAEE"/>
+
+            <!-- EYELASHES -->
+            <path d="M 57 93 L 55 91" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M 111 93 L 113 91" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M 60 92 L 59 90" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M 108 92 L 109 90" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- NOSE -->
+            <path d="M 84 102 C 81 110 81 116 84 120 C 88 116 88 110 86 102"
+                  stroke="#A06E48" stroke-width="2"
+                  fill="none" stroke-linecap="round"/>
+            <ellipse cx="82.5" cy="120" rx="1.1" ry="0.7" fill="#8B5A3C" opacity="0.7"/>
+            <ellipse cx="86.5" cy="120" rx="1.1" ry="0.7" fill="#8B5A3C" opacity="0.7"/>
+
+            <!-- MOUTH (small thoughtful smile / closed lip line) -->
+            <path d="M 74 128 C 80 130 88 130 94 128"
+                  stroke="#5C2918" stroke-width="2.2"
+                  fill="none" stroke-linecap="round"/>
+            <!-- Slight upturn at corners -->
+            <path d="M 72 128 L 74 127" stroke="#5C2918" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M 96 128 L 94 127" stroke="#5C2918" stroke-width="1.8" stroke-linecap="round"/>
+
+            <!-- CHEEK BLUSH (subtle) -->
+            <ellipse cx="54" cy="116" rx="7" ry="3" fill="#EF4444" opacity="0.18"/>
+            <ellipse cx="114" cy="116" rx="7" ry="3" fill="#EF4444" opacity="0.18"/>
+
+            <!-- EARRINGS -->
+            <circle cx="42" cy="94" r="2.2" fill="#FBBF24"/>
+            <circle cx="126" cy="94" r="2.2" fill="#FBBF24"/>
+
+            <!-- SWEATER -->
+            <path d="M 40 178
+                     C 42 166 52 160 64 158
+                     L 104 158
+                     C 116 160 126 166 128 178
+                     L 134 280
+                     L 34 280 Z"
+                  fill="#22C55E"/>
+            <!-- Collar -->
+            <path d="M 72 162 C 78 168 90 168 96 162"
+                  stroke="#16A34A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M 70 160 L 70 165 M 98 160 L 98 165"
+                  stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Sweater body shadow -->
+            <path d="M 124 178 L 134 280 L 116 280 L 110 184 Z" fill="#16A34A" opacity="0.35"/>
+
+            <!-- LEFT ARM (raised, hand near cheek/temple — "thinking" pose) -->
+            <path d="M 40 178
+                     C 22 174 8 168 4 152
+                     C 0 142 8 134 18 130
+                     L 30 152
+                     L 50 188 Z"
+                  fill="#22C55E"/>
+            <!-- Forearm coming up to face -->
+            <path d="M 18 130
+                     C 28 116 38 108 50 108
+                     C 60 108 62 116 56 122
+                     L 36 134 Z"
+                  fill="#22C55E"/>
+            <!-- Hand near cheek (resting on chin) -->
+            <ellipse cx="52" cy="116" rx="11" ry="8" fill="#C68B5D" transform="rotate(-30 52 116)"/>
+            <!-- Finger lines -->
+            <path d="M 46 110 L 50 106" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+            <path d="M 48 114 L 52 110" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+            <path d="M 50 118 L 54 114" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+
+            <!-- RIGHT ARM (down at side) -->
+            <path d="M 128 178
+                     C 144 184 158 200 162 220
+                     C 164 240 158 256 148 258
+                     L 138 254
+                     L 130 200 Z"
+                  fill="#22C55E"/>
+            <!-- Cuff -->
+            <path d="M 142 252 C 148 258 156 258 162 254"
+                  stroke="#16A34A" stroke-width="2" fill="none"/>
+            <!-- Right hand -->
+            <ellipse cx="148" cy="262" rx="10" ry="8" fill="#C68B5D"/>
+            <path d="M 144 266 L 144 270" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+            <path d="M 148 266 L 148 270" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+            <path d="M 152 266 L 152 270" stroke="#A06E48" stroke-width="1" opacity="0.5"/>
+          </g>
+
+          <!-- ─── THINKING DOODLES (question marks, sparkles) AROUND HEAD ─── -->
+          <g opacity="0.85">
+            <text x="120" y="50" font-family="Fraunces, serif" font-size="42" fill="#EF4444" font-style="italic">?</text>
+            <text x="380" y="64" font-family="Fraunces, serif" font-size="34" fill="#FBBF24" font-style="italic">!</text>
+            <text x="190" y="38" font-family="Fraunces, serif" font-size="24" fill="#FB923C" font-style="italic">?</text>
+          </g>
+
+          <!-- Thought-bubble dots -->
+          <circle cx="280" cy="78" r="3" fill="#1A1612" opacity="0.35"/>
+          <circle cx="294" cy="68" r="4.5" fill="#1A1612" opacity="0.35"/>
+          <circle cx="312" cy="56" r="6" fill="#1A1612" opacity="0.35"/>
+
+          <!-- ─── SPARKLES ─── -->
+          <path d="M 870 120 L 873 128 L 881 130 L 873 132 L 870 140 L 867 132 L 859 130 L 867 128 Z" fill="#22C55E"/>
+          <path d="M 540 380 L 543 386 L 549 387 L 543 388 L 540 394 L 537 388 L 531 387 L 537 386 Z" fill="#FBBF24"/>
         </svg>
       </div>
 
@@ -2591,161 +2807,508 @@
         </div>
 
         <div class="cooking-scene" data-parallax="0.05">
-          <svg viewBox="0 0 600 460" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- Warm blob backdrop -->
-            <ellipse cx="300" cy="240" rx="280" ry="200" fill="#FEF3C7"/>
-            <circle cx="120" cy="120" r="60" fill="#FBBF24" opacity="0.35"/>
-            <circle cx="500" cy="380" r="80" fill="#FB923C" opacity="0.25"/>
+          <svg viewBox="0 0 640 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <radialGradient id="bg-warmth" cx="50%" cy="40%" r="65%">
+                <stop offset="0%" stop-color="#FEF3C7" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#FBF5E6" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="counter-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#E8B864"/>
+                <stop offset="100%" stop-color="#C8941F"/>
+              </linearGradient>
+              <linearGradient id="bowl-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#F4F6F8"/>
+                <stop offset="100%" stop-color="#D4DADE"/>
+              </linearGradient>
+            </defs>
 
-            <!-- Floor / counter base shadow -->
-            <ellipse cx="300" cy="430" rx="220" ry="14" fill="#1A1612" opacity="0.08"/>
+            <!-- ─── ATMOSPHERE ─── -->
+            <ellipse cx="320" cy="220" rx="320" ry="220" fill="url(#bg-warmth)"/>
+            <circle cx="100" cy="100" r="58" fill="#FBBF24" opacity="0.28"/>
+            <circle cx="540" cy="400" r="70" fill="#FB923C" opacity="0.22"/>
 
-            <!-- Kitchen counter -->
-            <rect x="40" y="320" width="520" height="14" fill="#E8B864"/>
-            <rect x="40" y="334" width="520" height="80" fill="#FBBF24" opacity="0.5"/>
-            <line x1="40" y1="334" x2="560" y2="334" stroke="#C8941F" stroke-width="2"/>
+            <!-- ─── COUNTER ─── -->
+            <ellipse cx="320" cy="465" rx="240" ry="14" fill="#1A1612" opacity="0.1"/>
+            <rect x="40" y="350" width="560" height="12" fill="url(#counter-grad)"/>
+            <rect x="40" y="362" width="560" height="98" fill="#F4D78F" opacity="0.7"/>
+            <line x1="40" y1="362" x2="600" y2="362" stroke="#A87922" stroke-width="1.5" opacity="0.5"/>
+            <!-- Wood grain hint -->
+            <path d="M 80 380 Q 200 384 320 380 Q 440 376 580 382" stroke="#C8941F" stroke-width="0.8" fill="none" opacity="0.3"/>
+            <path d="M 60 420 Q 200 424 340 420 Q 480 416 590 422" stroke="#C8941F" stroke-width="0.8" fill="none" opacity="0.3"/>
 
-            <!-- Tablet propped on counter -->
-            <g transform="translate(370, 230)">
-              <rect x="0" y="0" width="150" height="100" rx="10" fill="#1A1612"/>
-              <rect x="6" y="6" width="138" height="88" rx="5" fill="#FEFAEE"/>
-              <!-- Tablet content: step number + headline -->
-              <text x="14" y="26" font-family="JetBrains Mono, monospace" font-size="7" fill="#EF4444" letter-spacing="1">STEP 3 OF 7</text>
-              <text x="14" y="48" font-family="Fraunces, serif" font-size="13" fill="#1A1612" font-style="italic">Mash the</text>
-              <text x="14" y="64" font-family="Fraunces, serif" font-size="13" fill="#22C55E" font-style="italic">banana.</text>
+            <!-- ─── TABLET ON COUNTER (RIGHT) ─── -->
+            <g transform="translate(420, 240)">
+              <!-- Stand legs -->
+              <path d="M 30 110 L 14 145 M 130 110 L 146 145" stroke="#1A1612" stroke-width="3.5" stroke-linecap="round"/>
+              <!-- Bezel -->
+              <rect x="0" y="0" width="160" height="112" rx="11" fill="#1A1612"/>
+              <rect x="0" y="0" width="160" height="112" rx="11" fill="url(#counter-grad)" opacity="0.08"/>
+              <!-- Screen -->
+              <rect x="6" y="6" width="148" height="100" rx="6" fill="#FEFAEE"/>
+              <!-- Tablet UI -->
+              <text x="14" y="26" font-family="JetBrains Mono, monospace" font-size="7.5" fill="#EF4444" letter-spacing="1.2">STEP 3 OF 7</text>
+              <line x1="14" y1="32" x2="146" y2="32" stroke="#F0E5C6"/>
+              <text x="14" y="52" font-family="Fraunces, serif" font-size="14" fill="#1A1612" font-style="italic">Mash the</text>
+              <text x="14" y="70" font-family="Fraunces, serif" font-size="14" fill="#22C55E" font-style="italic">banana.</text>
               <!-- Next button -->
-              <rect x="14" y="74" width="44" height="14" rx="7" fill="#22C55E"/>
-              <text x="22" y="84" font-family="Plus Jakarta Sans, sans-serif" font-size="7" fill="#FEFAEE" font-weight="700">NEXT →</text>
-              <!-- Listening indicator -->
-              <circle cx="132" cy="14" r="3" fill="#22C55E"/>
-              <!-- Tablet stand line -->
-              <path d="M 30 100 L 14 130 M 120 100 L 136 130" stroke="#1A1612" stroke-width="3" stroke-linecap="round"/>
+              <rect x="14" y="82" width="48" height="16" rx="8" fill="#22C55E"/>
+              <text x="20" y="93" font-family="Plus Jakarta Sans, sans-serif" font-size="7.5" fill="#FEFAEE" font-weight="700">NEXT →</text>
+              <!-- Reading-aloud indicator -->
+              <circle cx="142" cy="16" r="3" fill="#22C55E">
+                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.6s" repeatCount="indefinite"/>
+              </circle>
+              <text x="125" y="19" font-family="JetBrains Mono, monospace" font-size="5" fill="#22C55E" text-anchor="end">LIVE</text>
             </g>
 
-            <!-- Mixing bowl on counter -->
-            <g transform="translate(140, 290)">
-              <ellipse cx="60" cy="0" rx="60" ry="14" fill="#E1E5E8"/>
-              <path d="M 0 0 Q 0 50 60 50 Q 120 50 120 0" fill="#F0F2F4"/>
-              <path d="M 0 0 Q 0 50 60 50 Q 120 50 120 0" fill="none" stroke="#C8CDD2" stroke-width="2"/>
-              <!-- Pancake batter -->
-              <ellipse cx="60" cy="-2" rx="48" ry="9" fill="#FEF3C7"/>
-              <ellipse cx="52" cy="-4" rx="14" ry="3" fill="#FBBF24" opacity="0.5"/>
-              <!-- Spoon sticking out -->
-              <rect x="80" y="-46" width="6" height="46" rx="3" fill="#8B5A2B" transform="rotate(20 83 -23)"/>
-              <ellipse cx="98" cy="-58" rx="10" ry="14" fill="#8B5A2B" transform="rotate(20 98 -58)"/>
+            <!-- ─── MIXING BOWL (CENTER) ─── -->
+            <g transform="translate(220, 322)">
+              <!-- Bowl shadow on counter -->
+              <ellipse cx="70" cy="46" rx="76" ry="6" fill="#1A1612" opacity="0.1"/>
+              <!-- Bowl body -->
+              <path d="M 4 0 Q 4 56 70 56 Q 136 56 136 0" fill="url(#bowl-grad)" stroke="#9CA4A8" stroke-width="1.5"/>
+              <!-- Bowl rim -->
+              <ellipse cx="70" cy="0" rx="66" ry="9" fill="#E4E8EB"/>
+              <ellipse cx="70" cy="-1" rx="60" ry="6" fill="#FEFAEE"/>
+              <!-- Pancake batter inside -->
+              <ellipse cx="70" cy="2" rx="54" ry="8" fill="#FEF3C7"/>
+              <ellipse cx="58" cy="-2" rx="20" ry="3" fill="#FBBF24" opacity="0.6"/>
+              <!-- Flour dust on rim -->
+              <circle cx="22" cy="2" r="1.5" fill="#FFFFFF" opacity="0.8"/>
+              <circle cx="118" cy="3" r="1.2" fill="#FFFFFF" opacity="0.7"/>
+              <circle cx="60" cy="-5" r="1" fill="#FFFFFF" opacity="0.7"/>
+              <!-- Wooden spoon -->
+              <g transform="rotate(22 95 -10)">
+                <rect x="90" y="-50" width="7" height="50" rx="3" fill="#A06E48"/>
+                <rect x="90" y="-50" width="3" height="50" fill="#8B5A2B"/>
+                <ellipse cx="93" cy="-60" rx="11" ry="14" fill="#A06E48"/>
+                <ellipse cx="93" cy="-62" rx="7" ry="9" fill="#8B5A2B" opacity="0.5"/>
+              </g>
             </g>
 
-            <!-- Parent figure (left) -->
-            <g transform="translate(60, 90)">
-              <!-- Body / sweater -->
-              <path d="M 30 130 L 14 250 L 130 250 L 114 130 Q 100 122 72 122 Q 44 122 30 130 Z" fill="#22C55E"/>
-              <!-- Apron strings around back -->
-              <path d="M 30 134 Q 16 140 12 152" stroke="#16A34A" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <!-- Apron -->
-              <path d="M 38 140 L 30 240 L 114 240 L 106 140 Q 90 134 72 134 Q 54 134 38 140 Z" fill="#FEFAEE"/>
+            <!-- ─── PARENT (LEFT) ─── -->
+            <g transform="translate(40, 90)">
+
+              <!-- HAIR BACK LAYER (halo around head and bun) -->
+              <path d="M 28 50
+                       C 18 70 14 100 22 130
+                       C 28 150 38 158 46 162
+                       L 46 110
+                       C 40 90 38 70 44 54
+                       C 60 38 84 32 102 38
+                       C 122 44 138 58 138 78
+                       C 138 96 132 110 124 116
+                       L 124 162
+                       C 132 158 142 150 148 130
+                       C 156 100 152 70 142 50
+                       C 120 28 88 22 64 28
+                       C 46 32 32 40 28 50 Z"
+                    fill="#2E2018"/>
+
+              <!-- NECK -->
+              <path d="M 70 142 L 68 162 L 96 162 L 94 142 Z" fill="#C68B5D"/>
+              <path d="M 68 158 L 70 162 L 94 162 L 96 158 Z" fill="#A06E48" opacity="0.4"/>
+
+              <!-- FACE (oval with chin) -->
+              <path d="M 84 46
+                       C 106 46 122 58 126 78
+                       C 128 94 126 110 118 122
+                       C 110 132 98 138 84 138
+                       C 70 138 58 132 50 122
+                       C 42 110 40 94 42 78
+                       C 46 58 62 46 84 46 Z"
+                    fill="#C68B5D"/>
+
+              <!-- Face shadow side -->
+              <path d="M 116 78 C 128 94 126 110 118 122 C 112 130 104 134 96 136 C 110 130 116 110 116 88 C 116 84 116 80 116 78 Z"
+                    fill="#A06E48" opacity="0.3"/>
+
+              <!-- EARS -->
+              <ellipse cx="42" cy="86" rx="5" ry="9" fill="#C68B5D"/>
+              <path d="M 42 82 C 40 86 40 92 42 96" stroke="#8B5A3C" stroke-width="1" fill="none"/>
+              <ellipse cx="126" cy="86" rx="5" ry="9" fill="#C68B5D"/>
+              <path d="M 126 82 C 128 86 128 92 126 96" stroke="#8B5A3C" stroke-width="1" fill="none"/>
+
+              <!-- HAIR FRONT (bangs/curls covering forehead) -->
+              <path d="M 48 60
+                       C 54 50 64 44 76 44
+                       C 86 44 92 50 96 56
+                       C 100 50 108 46 116 48
+                       C 124 50 130 56 130 66
+                       C 122 62 112 60 104 64
+                       C 98 66 94 70 92 74
+                       C 88 68 82 64 76 64
+                       C 66 62 54 64 48 70 Z"
+                    fill="#3A2A1E"/>
+              <circle cx="58" cy="56" r="6" fill="#3A2A1E"/>
+              <circle cx="72" cy="50" r="6" fill="#3A2A1E"/>
+              <circle cx="88" cy="52" r="6" fill="#3A2A1E"/>
+              <circle cx="106" cy="52" r="6" fill="#3A2A1E"/>
+              <circle cx="120" cy="58" r="6" fill="#3A2A1E"/>
+
+              <!-- MESSY BUN ON TOP -->
+              <ellipse cx="84" cy="28" rx="28" ry="16" fill="#3A2A1E"/>
+              <circle cx="72" cy="20" r="11" fill="#2E2018"/>
+              <circle cx="92" cy="22" r="9" fill="#2E2018"/>
+              <ellipse cx="84" cy="40" rx="16" ry="3" fill="#1A1612"/>
+              <!-- Hair tie -->
+              <ellipse cx="84" cy="42" rx="12" ry="2" fill="#5C2918"/>
+
+              <!-- LOOSE STRANDS -->
+              <path d="M 46 100 C 38 110 34 120 36 132"
+                    stroke="#3A2A1E" stroke-width="4"
+                    fill="none" stroke-linecap="round"/>
+              <path d="M 126 98 C 132 108 134 118 130 130"
+                    stroke="#3A2A1E" stroke-width="3"
+                    fill="none" stroke-linecap="round"/>
+
+              <!-- EYEBROWS -->
+              <path d="M 58 86 C 64 82 70 82 76 86"
+                    stroke="#1A1612" stroke-width="3.5"
+                    fill="none" stroke-linecap="round"/>
+              <path d="M 92 86 C 98 82 104 82 110 86"
+                    stroke="#1A1612" stroke-width="3.5"
+                    fill="none" stroke-linecap="round"/>
+
+              <!-- EYES (almond, looking down toward kid right) -->
+              <!-- Left -->
+              <path d="M 58 96 C 64 92 72 92 76 96 C 72 100 64 100 58 98 Z" fill="#FEFAEE"/>
+              <ellipse cx="68" cy="97" rx="4" ry="4.5" fill="#3A2A1E"/>
+              <circle cx="68" cy="98" r="2" fill="#1A1612"/>
+              <circle cx="69.5" cy="96" r="1" fill="#FEFAEE"/>
+              <!-- Right -->
+              <path d="M 92 96 C 98 92 106 92 110 96 C 106 100 98 100 92 98 Z" fill="#FEFAEE"/>
+              <ellipse cx="101" cy="97" rx="4" ry="4.5" fill="#3A2A1E"/>
+              <circle cx="101" cy="98" r="2" fill="#1A1612"/>
+              <circle cx="102.5" cy="96" r="1" fill="#FEFAEE"/>
+
+              <!-- EYELASHES -->
+              <path d="M 57 93 L 55 91" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M 111 93 L 113 91" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M 60 92 L 59 90" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M 108 92 L 109 90" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+
+              <!-- NOSE -->
+              <path d="M 84 102 C 81 110 81 116 84 120 C 88 116 88 110 86 102"
+                    stroke="#A06E48" stroke-width="2"
+                    fill="none" stroke-linecap="round"/>
+              <ellipse cx="82.5" cy="120" rx="1.1" ry="0.7" fill="#8B5A3C" opacity="0.7"/>
+              <ellipse cx="86.5" cy="120" rx="1.1" ry="0.7" fill="#8B5A3C" opacity="0.7"/>
+
+              <!-- MOUTH (warm smile) -->
+              <path d="M 72 128 C 78 134 90 134 96 128 C 90 130 78 130 72 128 Z"
+                    fill="#5C2918" stroke="#5C2918" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M 74 130 C 80 132 88 132 94 130"
+                    stroke="#EF4444" stroke-width="1.5"
+                    fill="none" opacity="0.5" stroke-linecap="round"/>
+
+              <!-- CHEEK BLUSH -->
+              <ellipse cx="54" cy="116" rx="7" ry="3" fill="#EF4444" opacity="0.22"/>
+              <ellipse cx="114" cy="116" rx="7" ry="3" fill="#EF4444" opacity="0.22"/>
+
+              <!-- EARRINGS -->
+              <circle cx="42" cy="94" r="2.2" fill="#FBBF24"/>
+              <circle cx="126" cy="94" r="2.2" fill="#FBBF24"/>
+
+              <!-- SWEATER (sweater band visible above apron) -->
+              <path d="M 40 178
+                       C 42 166 52 160 64 158
+                       L 104 158
+                       C 116 160 126 166 128 178
+                       L 128 210
+                       L 40 210 Z"
+                    fill="#22C55E"/>
+              <!-- Collar curve -->
+              <path d="M 72 162 C 78 168 90 168 96 162"
+                    stroke="#16A34A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- Collar ribbing detail -->
+              <path d="M 70 160 L 70 165 M 98 160 L 98 165"
+                    stroke="#16A34A" stroke-width="1.5" stroke-linecap="round"/>
+
+              <!-- LEFT ARM (down at side) -->
+              <path d="M 40 180
+                       C 28 184 18 200 16 222
+                       C 14 240 18 256 26 264
+                       L 38 260
+                       L 42 200 Z"
+                    fill="#22C55E"/>
+              <path d="M 16 222 C 14 240 18 256 26 264 L 22 258 L 18 240 Z"
+                    fill="#16A34A" opacity="0.45"/>
+              <!-- Cuff -->
+              <path d="M 16 256 C 18 262 26 264 32 262"
+                    stroke="#16A34A" stroke-width="2" fill="none"/>
+              <!-- Left hand -->
+              <ellipse cx="28" cy="270" rx="11" ry="9" fill="#C68B5D"/>
+              <!-- Thumb -->
+              <path d="M 19 268 C 16 270 16 274 18 276"
+                    stroke="#A06E48" stroke-width="1" fill="none" opacity="0.6"/>
+              <!-- Finger creases -->
+              <path d="M 24 273 L 24 278" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+              <path d="M 28 273 L 28 278" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+              <path d="M 32 273 L 32 278" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+
+              <!-- RIGHT ARM (extended toward bowl/kid) -->
+              <path d="M 128 180
+                       C 142 184 158 200 168 218
+                       C 172 230 168 240 158 244
+                       L 148 240
+                       L 124 200 Z"
+                    fill="#22C55E"/>
+              <path d="M 168 218 C 172 230 168 240 158 244 L 164 232 L 166 220 Z"
+                    fill="#16A34A" opacity="0.4"/>
+              <!-- Cuff -->
+              <path d="M 168 234 C 170 240 162 244 156 244"
+                    stroke="#16A34A" stroke-width="2" fill="none"/>
+              <!-- Right hand (above bowl, gesturing) -->
+              <ellipse cx="158" cy="248" rx="10" ry="8" fill="#C68B5D"/>
+              <path d="M 154 252 L 154 256" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+              <path d="M 158 252 L 158 256" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+              <path d="M 162 252 L 162 256" stroke="#A06E48" stroke-width="0.8" opacity="0.5"/>
+
+              <!-- APRON OVER SWEATER -->
+              <path d="M 50 196
+                       Q 64 192 84 192
+                       Q 104 192 118 196
+                       L 124 300
+                       L 44 300 Z"
+                    fill="#FEFAEE"/>
+              <path d="M 118 196 L 124 300 L 108 300 L 110 200 Z"
+                    fill="#F0E5C6"/>
+              <!-- Apron neck strap -->
+              <path d="M 52 196 C 54 168 70 160 84 158 C 98 160 114 168 116 196"
+                    stroke="#FEFAEE" stroke-width="7" fill="none"/>
+              <path d="M 52 196 C 54 168 70 160 84 158 C 98 160 114 168 116 196"
+                    stroke="#F0E5C6" stroke-width="2" fill="none" opacity="0.6"/>
+              <!-- Apron waist ties -->
+              <path d="M 50 234 Q 38 238 28 240"
+                    stroke="#F0E5C6" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M 118 234 Q 130 238 140 240"
+                    stroke="#F0E5C6" stroke-width="3.5" fill="none" stroke-linecap="round"/>
               <!-- Apron pocket -->
-              <rect x="56" y="190" width="36" height="24" rx="3" fill="#22C55E" opacity="0.25"/>
-              <line x1="56" y1="190" x2="92" y2="190" stroke="#22C55E" stroke-width="2"/>
-              <!-- Neck -->
-              <rect x="60" y="105" width="24" height="20" fill="#E6B89C"/>
-              <!-- Head -->
-              <circle cx="72" cy="78" r="38" fill="#E6B89C"/>
-              <!-- Hair: bun + waves -->
-              <ellipse cx="72" cy="52" rx="38" ry="26" fill="#3A2A1E"/>
-              <circle cx="68" cy="32" r="16" fill="#3A2A1E"/>
-              <!-- Loose strands -->
-              <path d="M 38 64 Q 30 88 38 110" stroke="#3A2A1E" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M 108 70 Q 116 90 110 108" stroke="#3A2A1E" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <!-- Face: eyes (looking down at kid, smile) -->
-              <path d="M 56 82 Q 62 86 68 82" stroke="#1A1612" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M 78 82 Q 84 86 90 82" stroke="#1A1612" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <!-- Smile -->
-              <path d="M 60 98 Q 72 108 84 98" stroke="#1A1612" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <!-- Cheek blush -->
-              <ellipse cx="52" cy="92" rx="6" ry="3" fill="#EF4444" opacity="0.3"/>
-              <ellipse cx="92" cy="92" rx="6" ry="3" fill="#EF4444" opacity="0.3"/>
-              <!-- Arm reaching down toward kid -->
-              <path d="M 30 150 Q 10 180 30 220" stroke="#22C55E" stroke-width="22" fill="none" stroke-linecap="round"/>
-              <circle cx="34" cy="226" r="14" fill="#E6B89C"/>
+              <path d="M 64 260 L 66 290 Q 74 294 84 294 Q 94 294 102 290 L 104 260 Z"
+                    fill="#F0E5C6"/>
+              <line x1="64" y1="260" x2="104" y2="260" stroke="#D9C9A0" stroke-width="2"/>
+              <!-- Pocket stitch -->
+              <path d="M 68 264 L 100 264" stroke="#D9C9A0" stroke-width="0.8" stroke-dasharray="2,2"/>
+
             </g>
 
-            <!-- Kid figure (right, on stool) -->
-            <g transform="translate(270, 175)">
-              <!-- Stool -->
-              <rect x="0" y="140" width="60" height="58" rx="4" fill="#FB923C"/>
-              <rect x="0" y="140" width="60" height="6" fill="#EA7B23"/>
-              <rect x="6" y="198" width="6" height="36" fill="#1A1612"/>
-              <rect x="48" y="198" width="6" height="36" fill="#1A1612"/>
-              <!-- Body / shirt -->
-              <path d="M 2 100 L -6 160 L 66 160 L 58 100 Q 50 94 30 94 Q 10 94 2 100 Z" fill="#FBBF24"/>
-              <!-- Shirt stripe -->
-              <path d="M -4 130 L 64 130" stroke="#EF4444" stroke-width="4"/>
-              <!-- Arms reaching toward bowl -->
-              <path d="M 0 110 Q -20 130 -32 140" stroke="#FBBF24" stroke-width="14" fill="none" stroke-linecap="round"/>
-              <circle cx="-36" cy="142" r="9" fill="#E6B89C"/>
-              <path d="M 60 110 Q 76 124 86 132" stroke="#FBBF24" stroke-width="14" fill="none" stroke-linecap="round"/>
-              <circle cx="90" cy="134" r="9" fill="#E6B89C"/>
-              <!-- Neck -->
-              <rect x="22" y="78" width="16" height="20" fill="#E6B89C"/>
-              <!-- Head -->
-              <circle cx="30" cy="58" r="28" fill="#E6B89C"/>
-              <!-- Hair: pigtails -->
-              <ellipse cx="30" cy="38" rx="28" ry="20" fill="#5A3A22"/>
-              <circle cx="6" cy="48" r="10" fill="#5A3A22"/>
-              <circle cx="54" cy="48" r="10" fill="#5A3A22"/>
-              <!-- Pigtail bows -->
-              <circle cx="2" cy="40" r="4" fill="#EF4444"/>
-              <circle cx="58" cy="40" r="4" fill="#EF4444"/>
-              <!-- Eyes looking up at parent, big -->
-              <circle cx="20" cy="60" r="3" fill="#1A1612"/>
-              <circle cx="40" cy="60" r="3" fill="#1A1612"/>
-              <circle cx="21" cy="59" r="1" fill="#FFFFFF"/>
-              <circle cx="41" cy="59" r="1" fill="#FFFFFF"/>
-              <!-- Big smile -->
-              <path d="M 18 72 Q 30 82 42 72" stroke="#1A1612" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <!-- Cheek blush -->
-              <ellipse cx="14" cy="68" rx="4" ry="2.5" fill="#EF4444" opacity="0.4"/>
-              <ellipse cx="46" cy="68" rx="4" ry="2.5" fill="#EF4444" opacity="0.4"/>
+            <!-- ─── KID (RIGHT, ON STOOL) ─── -->
+            <g transform="translate(295, 198)">
+
+              <!-- STOOL -->
+              <ellipse cx="34" cy="270" rx="42" ry="5" fill="#1A1612" opacity="0.15"/>
+              <rect x="0" y="160" width="68" height="14" rx="3" fill="#EA7B23"/>
+              <rect x="0" y="174" width="68" height="42" fill="#FB923C"/>
+              <path d="M 0 216 L 68 216" stroke="#C8631E" stroke-width="2"/>
+              <rect x="6" y="216" width="6" height="50" fill="#1A1612"/>
+              <rect x="56" y="216" width="6" height="50" fill="#1A1612"/>
+              <!-- Crossbar -->
+              <line x1="9" y1="246" x2="59" y2="246" stroke="#1A1612" stroke-width="2"/>
+
+              <!-- HAIR BACK -->
+              <path d="M -4 42
+                       C -10 54 -12 78 -6 100
+                       C -2 114 6 122 12 124
+                       L 12 80
+                       C 8 64 8 50 14 40
+                       C 24 26 42 22 54 26
+                       C 66 30 76 40 78 58
+                       L 78 124
+                       C 84 122 90 114 92 100
+                       C 96 80 92 60 82 42
+                       C 64 22 32 22 14 28
+                       C 6 32 -2 38 -4 42 Z"
+                    fill="#2E2018"/>
+
+              <!-- NECK -->
+              <path d="M 24 96 L 22 116 L 46 116 L 44 96 Z" fill="#D9A47A"/>
+
+              <!-- FACE -->
+              <path d="M 36 28
+                       C 52 28 64 38 66 56
+                       C 66 70 64 84 56 92
+                       C 50 100 40 102 34 102
+                       C 24 102 16 98 12 90
+                       C 8 80 6 66 8 54
+                       C 12 38 22 28 36 28 Z"
+                    fill="#D9A47A"/>
+
+              <!-- Face shadow -->
+              <path d="M 58 56 C 64 70 62 84 56 92 C 52 96 48 98 44 98 C 52 90 56 76 56 62 C 56 58 57 56 58 56 Z"
+                    fill="#C68B5D" opacity="0.3"/>
+
+              <!-- EARS -->
+              <ellipse cx="10" cy="68" rx="5" ry="7" fill="#D9A47A"/>
+              <ellipse cx="64" cy="68" rx="5" ry="7" fill="#D9A47A"/>
+
+              <!-- HAIR FRONT (curly bangs) -->
+              <path d="M 10 42
+                       C 14 32 22 28 34 28
+                       C 46 28 54 34 60 40
+                       C 54 36 48 36 42 40
+                       C 36 38 30 38 24 40
+                       C 18 38 14 40 10 42 Z"
+                    fill="#3A2A1E"/>
+              <circle cx="18" cy="22" r="9" fill="#3A2A1E"/>
+              <circle cx="34" cy="14" r="11" fill="#3A2A1E"/>
+              <circle cx="52" cy="22" r="9" fill="#3A2A1E"/>
+              <circle cx="24" cy="26" r="7" fill="#2E2018"/>
+              <circle cx="42" cy="26" r="7" fill="#2E2018"/>
+
+              <!-- PIGTAIL PUFFS -->
+              <circle cx="-4" cy="56" r="15" fill="#3A2A1E"/>
+              <circle cx="-2" cy="62" r="11" fill="#2E2018"/>
+              <circle cx="74" cy="56" r="15" fill="#3A2A1E"/>
+              <circle cx="72" cy="62" r="11" fill="#2E2018"/>
+
+              <!-- PIGTAIL BOWS -->
+              <g transform="translate(-6, 44)">
+                <path d="M 0 0 L -10 -4 L -12 6 L -8 14 L 0 10 Z" fill="#EF4444"/>
+                <path d="M 0 0 L 10 -4 L 12 6 L 8 14 L 0 10 Z" fill="#EF4444"/>
+                <path d="M -10 -4 L -8 14 Z" stroke="#C44A2E" stroke-width="0.5" opacity="0.4"/>
+                <circle cx="0" cy="5" r="3" fill="#C44A2E"/>
+                <circle cx="-1" cy="4" r="1" fill="#FEF3C7" opacity="0.6"/>
+              </g>
+              <g transform="translate(72, 44)">
+                <path d="M 0 0 L -10 -4 L -12 6 L -8 14 L 0 10 Z" fill="#EF4444"/>
+                <path d="M 0 0 L 10 -4 L 12 6 L 8 14 L 0 10 Z" fill="#EF4444"/>
+                <circle cx="0" cy="5" r="3" fill="#C44A2E"/>
+                <circle cx="-1" cy="4" r="1" fill="#FEF3C7" opacity="0.6"/>
+              </g>
+
+              <!-- EYEBROWS (raised in delight) -->
+              <path d="M 16 56 C 20 52 24 52 28 56"
+                    stroke="#2E2018" stroke-width="2.8"
+                    fill="none" stroke-linecap="round"/>
+              <path d="M 42 56 C 46 52 50 52 54 56"
+                    stroke="#2E2018" stroke-width="2.8"
+                    fill="none" stroke-linecap="round"/>
+
+              <!-- EYES (big, looking UP at parent) -->
+              <!-- Left -->
+              <ellipse cx="22" cy="66" rx="5.5" ry="6.5" fill="#FEFAEE"/>
+              <ellipse cx="22" cy="65" rx="4.5" ry="5.5" fill="#3A2A1E"/>
+              <circle cx="22" cy="64" r="2.8" fill="#1A1612"/>
+              <circle cx="23.5" cy="63" r="1.6" fill="#FEFAEE"/>
+              <circle cx="21" cy="67" r="0.8" fill="#FEFAEE" opacity="0.7"/>
+              <!-- Right -->
+              <ellipse cx="48" cy="66" rx="5.5" ry="6.5" fill="#FEFAEE"/>
+              <ellipse cx="48" cy="65" rx="4.5" ry="5.5" fill="#3A2A1E"/>
+              <circle cx="48" cy="64" r="2.8" fill="#1A1612"/>
+              <circle cx="49.5" cy="63" r="1.6" fill="#FEFAEE"/>
+              <circle cx="47" cy="67" r="0.8" fill="#FEFAEE" opacity="0.7"/>
+
+              <!-- EYELASHES -->
+              <path d="M 17 61 L 15 59" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M 53 61 L 55 59" stroke="#1A1612" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M 20 60 L 19 58" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M 50 60 L 51 58" stroke="#1A1612" stroke-width="1.2" stroke-linecap="round"/>
+
+              <!-- NOSE (button) -->
+              <ellipse cx="35" cy="78" rx="3" ry="2" fill="#C68B5D" opacity="0.65"/>
+              <circle cx="35" cy="77" r="0.9" fill="#FEFAEE" opacity="0.5"/>
+
+              <!-- MOUTH (big grin showing teeth + tongue) -->
+              <path d="M 20 88 C 24 98 46 98 50 88 C 40 92 30 92 20 88 Z"
+                    fill="#5C2918" stroke="#5C2918" stroke-width="1.8" stroke-linejoin="round"/>
+              <!-- Teeth -->
+              <path d="M 24 88 L 26 92 L 30 92 L 30 88 Z M 30 88 L 32 92 L 36 92 L 35 88 Z M 35 88 L 36 92 L 40 92 L 41 88 Z M 41 88 L 42 92 L 46 92 L 46 88 Z"
+                    fill="#FEFAEE"/>
+              <!-- Tongue -->
+              <ellipse cx="35" cy="94" rx="6" ry="2" fill="#EF4444" opacity="0.8"/>
+
+              <!-- CHEEK BLUSH (kids = more visible) -->
+              <ellipse cx="10" cy="82" rx="6" ry="4" fill="#EF4444" opacity="0.45"/>
+              <ellipse cx="60" cy="82" rx="6" ry="4" fill="#EF4444" opacity="0.45"/>
+
+              <!-- BODY: SHIRT -->
+              <path d="M 8 124
+                       C 14 120 22 118 35 118
+                       C 48 118 56 120 62 124
+                       L 66 174
+                       L 4 174 Z"
+                    fill="#FBBF24"/>
+              <!-- Red horizontal stripe -->
+              <path d="M 6 144 L 64 144" stroke="#EF4444" stroke-width="5"/>
+              <!-- Shirt shadow on right -->
+              <path d="M 62 124 L 66 174 L 56 174 L 54 126 Z"
+                    fill="#E8A912" opacity="0.5"/>
+              <!-- Collar curve -->
+              <path d="M 26 124 C 30 128 40 128 44 124"
+                    stroke="#E8A912" stroke-width="1.5" fill="none"/>
+
+              <!-- LEFT ARM (toward bowl) -->
+              <path d="M 10 130
+                       C -8 138 -22 150 -32 162
+                       C -36 168 -32 174 -26 174
+                       L -18 168 Z"
+                    fill="#FBBF24"/>
+              <!-- Sleeve stripe continuation -->
+              <path d="M 4 142 L -8 148" stroke="#EF4444" stroke-width="3.5"/>
+              <!-- Left hand -->
+              <circle cx="-28" cy="172" r="10" fill="#D9A47A"/>
+              <!-- Knuckles + fingers -->
+              <path d="M -33 174 L -33 178" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+              <path d="M -28 175 L -28 179" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+              <path d="M -23 174 L -23 178" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+
+              <!-- RIGHT ARM (resting on counter) -->
+              <path d="M 62 130
+                       C 76 140 86 152 90 162
+                       C 92 168 88 174 82 174
+                       L 74 168 Z"
+                    fill="#FBBF24"/>
+              <path d="M 66 142 L 78 148" stroke="#EF4444" stroke-width="3.5"/>
+              <!-- Right hand -->
+              <circle cx="86" cy="172" r="9" fill="#D9A47A"/>
+              <path d="M 81 174 L 81 178" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+              <path d="M 86 175 L 86 179" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+              <path d="M 91 174 L 91 178" stroke="#C68B5D" stroke-width="1" opacity="0.5"/>
+
             </g>
 
-            <!-- Music notes floating from tablet -->
-            <g transform="translate(490, 150)">
-              <circle cx="0" cy="40" r="5" fill="#22C55E"/>
-              <rect x="4" y="14" width="2" height="28" fill="#22C55E"/>
-              <path d="M 4 14 Q 14 16 18 10 L 18 4 Q 14 12 4 8 Z" fill="#22C55E"/>
+            <!-- ─── MUSIC NOTES FLOATING FROM TABLET ─── -->
+            <g transform="translate(560, 170)" opacity="0.9">
+              <circle cx="0" cy="42" r="5" fill="#22C55E"/>
+              <rect x="4" y="14" width="2.5" height="30" fill="#22C55E"/>
+              <path d="M 4 14 C 14 16 20 24 22 14 L 22 6 C 20 16 14 8 4 8 Z" fill="#22C55E"/>
+              <animateTransform attributeName="transform" type="translate"
+                values="560 170; 560 150; 560 170"
+                dur="3s" repeatCount="indefinite"/>
             </g>
-            <g transform="translate(520, 100)">
-              <circle cx="0" cy="40" r="4" fill="#FBBF24"/>
-              <rect x="3" y="14" width="2" height="28" fill="#FBBF24"/>
-              <path d="M 3 14 Q 12 16 15 11 L 15 6 Q 12 12 3 8 Z" fill="#FBBF24"/>
-            </g>
-
-            <!-- Floating ingredients -->
-            <g transform="translate(80, 60)">
-              <circle cx="0" cy="0" r="14" fill="#FBBF24"/>
-              <ellipse cx="-4" cy="-3" rx="4" ry="2" fill="#FEF3C7" opacity="0.7"/>
-            </g>
-
-            <!-- Banana -->
-            <g transform="translate(440, 290)">
-              <path d="M 0 0 Q 6 -20 22 -22 Q 38 -24 44 -16 Q 38 -10 30 -8 Q 18 -2 10 8 Q 4 6 0 0 Z" fill="#FBBF24" stroke="#EA7B23" stroke-width="1.5"/>
+            <g transform="translate(595, 115)" opacity="0.8">
+              <circle cx="0" cy="38" r="4" fill="#FBBF24"/>
+              <rect x="3" y="12" width="2" height="28" fill="#FBBF24"/>
+              <path d="M 3 12 C 12 14 16 22 16 12 L 16 5 C 14 14 12 8 3 8 Z" fill="#FBBF24"/>
+              <animateTransform attributeName="transform" type="translate"
+                values="595 115; 595 95; 595 115"
+                dur="3.5s" repeatCount="indefinite"/>
             </g>
 
-            <!-- Sparkles -->
-            <g fill="#EF4444">
-              <path d="M 380 80 L 384 88 L 392 90 L 384 92 L 380 100 L 376 92 L 368 90 L 376 88 Z"/>
-            </g>
-            <g fill="#22C55E">
-              <path d="M 50 200 L 54 208 L 62 210 L 54 212 L 50 220 L 46 212 L 38 210 L 46 208 Z"/>
-            </g>
-            <g fill="#FBBF24">
-              <path d="M 540 250 L 543 256 L 549 257 L 543 258 L 540 264 L 537 258 L 531 257 L 537 256 Z"/>
+            <!-- ─── BANANA ON COUNTER ─── -->
+            <g transform="translate(420, 358)">
+              <path d="M 0 0 Q 6 -22 24 -24 Q 42 -26 48 -16 Q 42 -10 32 -8 Q 18 -2 10 10 Q 4 8 0 0 Z"
+                    fill="#FBBF24" stroke="#EA7B23" stroke-width="1.5"/>
+              <!-- Banana stem -->
+              <path d="M 46 -22 L 50 -28" stroke="#5C3924" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Banana highlight -->
+              <path d="M 8 -8 Q 22 -18 38 -16" stroke="#FEF3C7" stroke-width="1.5" fill="none" opacity="0.7"/>
             </g>
 
-            <!-- Steam from bowl -->
-            <path d="M 188 280 Q 184 260 192 248 Q 200 236 196 220" stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.65"/>
-            <path d="M 208 280 Q 214 258 206 244" stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
-            <path d="M 228 280 Q 222 264 230 250 Q 238 238 232 226" stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <!-- ─── SPARKLES ─── -->
+            <path d="M 380 76 L 384 86 L 394 88 L 384 90 L 380 100 L 376 90 L 366 88 L 376 86 Z" fill="#EF4444"/>
+            <path d="M 28 200 L 32 208 L 40 210 L 32 212 L 28 220 L 24 212 L 16 210 L 24 208 Z" fill="#22C55E"/>
+            <path d="M 590 290 L 593 296 L 599 297 L 593 298 L 590 304 L 587 298 L 581 297 L 587 296 Z" fill="#FBBF24"/>
+            <path d="M 248 80 L 251 86 L 257 87 L 251 88 L 248 94 L 245 88 L 239 87 L 245 86 Z" fill="#FB923C"/>
+
+            <!-- ─── STEAM FROM BOWL ─── -->
+            <path d="M 254 312 Q 248 290 256 276 Q 264 262 260 246"
+                  stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 280 312 Q 286 288 278 274"
+                  stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.45"/>
+            <path d="M 306 312 Q 300 294 308 280 Q 316 266 310 252"
+                  stroke="#A8B89F" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.55"/>
           </svg>
         </div>
       </article>
