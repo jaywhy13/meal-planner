@@ -8,6 +8,8 @@ interface RetriedRequestConfig extends InternalAxiosRequestConfig {
   _retried?: boolean;
 }
 
+const TOKEN_REFRESH_PATH = '/auth/token/refresh';
+
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -20,10 +22,19 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as RetriedRequestConfig | undefined;
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retried) {
+    // A 401 from the refresh endpoint itself must not trigger another refresh,
+    // otherwise the interceptor recurses into an infinite request loop.
+    const isTokenRefreshRequest = originalRequest?.url === TOKEN_REFRESH_PATH;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retried &&
+      !isTokenRefreshRequest
+    ) {
       originalRequest._retried = true;
       try {
-        await api.post('/auth/token/refresh');
+        await api.post(TOKEN_REFRESH_PATH);
         return api(originalRequest);
       } catch {
         window.location.href = '/login';
