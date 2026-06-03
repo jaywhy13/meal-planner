@@ -16,13 +16,17 @@ export interface Food {
   created_at: string;
 }
 
+export interface Meal {
+  id: number;
+  foods: Food[];
+  notes: string;
+}
+
 export interface DailyMeal {
   id: number;
   meal_plan: number;
-  date?: string;
-  day_of_week?: number;
-  week?: number;
-  day?: number;
+  date: string;
+  day_of_week: number;
   meal_type: MealType;
   foods: Food[];
   notes: string;

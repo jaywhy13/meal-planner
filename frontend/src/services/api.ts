@@ -26,9 +26,7 @@ export type UpdateFoodInput = Partial<CreateFoodInput>;
 
 export interface CreateDailyMealInput {
   meal_plan: number | string;
-  date?: string;
-  week?: number;
-  day?: number;
+  date: string;
   meal_type: MealType;
   food_ids: number[];
   notes?: string;

@@ -1,22 +1,24 @@
-import calendar
-from datetime import date, timedelta
-
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Q
-from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, MealSuggestion, MealSettings
 from .serializers import (
     MealPlanSerializer,
     MealPlanListSerializer,
     FoodSerializer,
     DailyMealSerializer,
+    DailyMealWriteSerializer,
     MealSuggestionSerializer,
     MealSettingsSerializer,
 )
-from .services import DailyMealService, MealPlanService, MealSettingsService
+from .services import (
+    DailyMealService,
+    MealPlanNotOwnedError,
+    MealPlanService,
+    MealSettingsService,
+)
 
 meal_plan_service = MealPlanService()
 daily_meal_service = DailyMealService()
@@ -33,7 +35,9 @@ class MealPlanViewSet(viewsets.ModelViewSet):
         return MealPlanSerializer
 
     def get_queryset(self):
-        return meal_plan_service.list_for_user(self.request.user.id)
+        if self.action == "list":
+            return meal_plan_service.list_for_user(self.request.user.id)
+        return meal_plan_service.detail_for_user(self.request.user.id)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -43,58 +47,8 @@ class MealPlanViewSet(viewsets.ModelViewSet):
         """Generate meals for the full calendar month of the plan's start_date"""
         meal_plan = self.get_object()
         wipe = request.data.get("wipe", False)
-
-        meal_settings, _ = MealSettings.objects.get_or_create(meal_plan=meal_plan)
-        suggestions = MealSuggestion.objects.filter(is_healthy=True)
-
-        if wipe:
-            meal_plan.daily_meals.all().delete()
-
-        # Map ISO weekday (1-7) to MealSettings field name
-        day_field_map = {
-            1: "monday_enabled",
-            2: "tuesday_enabled",
-            3: "wednesday_enabled",
-            4: "thursday_enabled",
-            5: "friday_enabled",
-            6: "saturday_enabled",
-            7: "sunday_enabled",
-        }
-
-        enabled_meal_types = [
-            mt
-            for mt, field in [
-                ("breakfast", "breakfast_enabled"),
-                ("lunch", "lunch_enabled"),
-                ("dinner", "dinner_enabled"),
-                ("snack", "snack_enabled"),
-            ]
-            if getattr(meal_settings, field)
-        ]
-
-        start = meal_plan.start_date.replace(day=1)
-        _, days_in_month = calendar.monthrange(start.year, start.month)
-
-        for offset in range(days_in_month):
-            current_date = start + timedelta(days=offset)
-            day_field = day_field_map[current_date.isoweekday()]
-            if not getattr(meal_settings, day_field):
-                continue
-
-            for meal_type in enabled_meal_types:
-                meal, created = DailyMeal.objects.get_or_create(
-                    meal_plan=meal_plan,
-                    date=current_date,
-                    meal_type=meal_type,
-                )
-                if created and suggestions.exists():
-                    suggestion = suggestions.filter(meal_type=meal_type).first()
-                    if suggestion:
-                        meal.foods.set(suggestion.foods.all())
-                        meal.notes = suggestion.description
-                        meal.save()
-
-        serializer = self.get_serializer(meal_plan)
+        meal_plan_service.generate_meals(meal_plan.id, wipe)
+        serializer = self.get_serializer(self.get_object())
         return Response(serializer.data)
 
 
@@ -116,23 +70,91 @@ class FoodViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class DailyMealViewSet(viewsets.ModelViewSet):
-    queryset = DailyMeal.objects.all()
-    serializer_class = DailyMealSerializer
+class DailyMealViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        meal_plan_id = self.request.query_params.get("meal_plan")
-        return daily_meal_service.list_for_user(
-            self.request.user.id,
+    def list(self, request):
+        meal_plan_id = request.query_params.get("meal_plan")
+        daily_meals = daily_meal_service.list_for_user(
+            request.user.id,
             meal_plan_id=int(meal_plan_id) if meal_plan_id else None,
         )
+        return Response(DailyMealSerializer(daily_meals, many=True).data)
 
-    def perform_create(self, serializer):
-        meal_plan = serializer.validated_data.get("meal_plan")
-        if meal_plan and meal_plan.user != self.request.user:
+    def retrieve(self, request, pk=None):
+        daily_meal_id = self._parse_daily_meal_id(pk)
+        if daily_meal_id is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        daily_meal = daily_meal_service.get_for_user(request.user.id, daily_meal_id)
+        if daily_meal is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(DailyMealSerializer(daily_meal).data)
+
+    def create(self, request):
+        payload = DailyMealWriteSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        fields = self._fields_from(payload.validated_data)
+        try:
+            daily_meal = daily_meal_service.create(user_id=request.user.id, **fields)
+        except MealPlanNotOwnedError:
             raise PermissionDenied("You do not own this meal plan.")
-        serializer.save()
+        return Response(DailyMealSerializer(daily_meal).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        return self._write(request, pk, partial=False)
+
+    def partial_update(self, request, pk=None):
+        return self._write(request, pk, partial=True)
+
+    def destroy(self, request, pk=None):
+        daily_meal_id = self._parse_daily_meal_id(pk)
+        if daily_meal_id is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        existing = daily_meal_service.get_for_user(request.user.id, daily_meal_id)
+        if existing is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        daily_meal_service.delete(request.user.id, daily_meal_id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def _write(self, request, pk, partial):
+        daily_meal_id = self._parse_daily_meal_id(pk)
+        if daily_meal_id is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        existing = daily_meal_service.get_for_user(request.user.id, daily_meal_id)
+        if existing is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        payload = DailyMealWriteSerializer(data=request.data, partial=partial)
+        payload.is_valid(raise_exception=True)
+        fields = self._fields_from(payload.validated_data, fallback=existing)
+        try:
+            daily_meal = daily_meal_service.update(
+                user_id=request.user.id, daily_meal_id=daily_meal_id, **fields
+            )
+        except MealPlanNotOwnedError:
+            raise PermissionDenied("You do not own this meal plan.")
+        return Response(DailyMealSerializer(daily_meal).data)
+
+    @staticmethod
+    def _parse_daily_meal_id(pk):
+        try:
+            return int(pk)
+        except (TypeError, ValueError):
+            return None
+
+    def _fields_from(self, validated_data, fallback=None):
+        meal_plan = validated_data.get("meal_plan")
+        meal_plan_id = meal_plan.id if meal_plan else (fallback.meal_plan_id if fallback else None)
+        return {
+            "meal_plan_id": meal_plan_id,
+            "date": validated_data.get("date", fallback.date if fallback else None),
+            "meal_type": validated_data.get("meal_type", fallback.meal_type if fallback else None),
+            "food_ids": (
+                [food.id for food in validated_data["food_ids"]]
+                if "food_ids" in validated_data
+                else [food.id for food in fallback.foods]
+            ),
+            "notes": validated_data.get("notes", fallback.notes if fallback else ""),
+        }
 
 
 class MealSuggestionViewSet(viewsets.ReadOnlyModelViewSet):

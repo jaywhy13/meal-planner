@@ -36,15 +36,30 @@ class MealType(models.TextChoices):
     SNACK = "snack", "Snack"
 
 
+class Meal(models.Model):
+    """A reusable meal — a set of foods with notes — that can be assigned to many daily slots"""
+
+    foods = models.ManyToManyField(Food, blank=True)
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.notes[:50] if self.notes else f"Meal #{self.pk}"
+
+
 class DailyMeal(models.Model):
-    """Represents meals for a specific calendar date in a meal plan"""
+    """A meal of a given type on a specific date within a meal plan"""
 
     meal_plan = models.ForeignKey(MealPlan, on_delete=models.CASCADE, related_name="daily_meals")
     date = models.DateField()
     day_of_week = models.PositiveSmallIntegerField(db_index=True)  # ISO weekday: 1=Mon, 7=Sun
     meal_type = models.CharField(max_length=20, choices=MealType.choices)
-    foods = models.ManyToManyField(Food, blank=True)
-    notes = models.TextField(blank=True)
+    meal = models.ForeignKey(
+        Meal,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="daily_meals",
+    )
 
     class Meta:
         unique_together = ["meal_plan", "date", "meal_type"]

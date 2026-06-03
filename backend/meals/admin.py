@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, DailyMeal, Meal, MealSuggestion, MealSettings
 
 
 @admin.register(MealPlan)
@@ -19,9 +19,16 @@ class FoodAdmin(admin.ModelAdmin):
 
 @admin.register(DailyMeal)
 class DailyMealAdmin(admin.ModelAdmin):
-    list_display = ["meal_plan", "date", "day_of_week", "meal_type", "foods_display"]
+    list_display = ["meal_plan", "date", "day_of_week", "meal_type"]
     list_filter = ["meal_type", "day_of_week", "meal_plan"]
-    search_fields = ["meal_plan__name", "notes"]
+    search_fields = ["meal_plan__name"]
+
+
+@admin.register(Meal)
+class MealAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "foods_display"]
+    list_filter = ["daily_meals__meal_type", "daily_meals__meal_plan"]
+    search_fields = ["notes", "daily_meals__meal_plan__name"]
     filter_horizontal = ["foods"]
 
     @admin.display(description="Foods")

@@ -28,13 +28,7 @@ import { colors, semantic, shadows } from '../theme/tokens';
 import DateRangeBar from './mealPlanDetail/DateRangeBar';
 import WeekGrid, { AddMealRequest, MealTypeOption } from './mealPlanDetail/WeekGrid';
 import { WeekGridMeal } from './mealPlanDetail/MealCell';
-import type {
-  DailyMeal,
-  Food,
-  MealPlan,
-  MealSettings as MealSettingsData,
-  MealType,
-} from '../types';
+import type { Food, DailyMeal, MealPlan, MealSettings as MealSettingsData, MealType } from '../types';
 
 const MEAL_TYPES: MealTypeOption[] = [
   { value: 'breakfast', label: 'Breakfast' },
@@ -135,12 +129,15 @@ const MealPlanDetail = (): React.ReactElement => {
     : MEAL_TYPES;
 
   const mealsForCurrentWeek: WeekGridMeal[] = dailyMeals
-    .filter((meal) => meal.week === currentWeek)
-    .map((meal) => ({
-      id: meal.id,
-      day: meal.day ?? 0,
-      meal_type: meal.meal_type,
-      foods: meal.foods,
+    .filter((dailyMeal) => {
+      const mealDate = dayjs(dailyMeal.date);
+      return !mealDate.isBefore(weekStart, 'day') && !mealDate.isAfter(weekEnd, 'day');
+    })
+    .map((dailyMeal) => ({
+      id: dailyMeal.id,
+      day: dailyMeal.day_of_week,
+      meal_type: dailyMeal.meal_type,
+      foods: dailyMeal.foods,
     }));
 
   const openAddDialog = ({ day, mealType }: AddMealRequest): void => {
@@ -181,8 +178,7 @@ const MealPlanDetail = (): React.ReactElement => {
     try {
       const mealData = {
         meal_plan: id,
-        week: currentWeek,
-        day: selectedDay,
+        date: weekStart.add(selectedDay - 1, 'day').format('YYYY-MM-DD'),
         meal_type: selectedMealType,
         food_ids: selectedFoods.map((food) => food.id),
         notes,
