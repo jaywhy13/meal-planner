@@ -14,7 +14,7 @@ Full-stack meal planning application with a **Django REST API backend** and **Re
 ## Stack
 
 - **Backend**: Python 3.10, Django 4.2, Django REST Framework, PostgreSQL (prod) / SQLite (dev)
-- **Frontend**: React 19, Material UI 7, Axios, Day.js, JavaScript (not TypeScript)
+- **Frontend**: React 19, Material UI 7, Axios, Day.js, TypeScript
 - **Infrastructure**: Docker Compose (dev), AWS Lambda (prod), Pulumi
 - **CI**: GitHub Actions — backend runs `python manage.py test meals`, frontend runs `npm run build`
 
@@ -36,7 +36,7 @@ The `lambda-*` targets in the root `Makefile` are exclusively for AWS infrastruc
 
 **Backend** — four explicit layers. The **view layer** (`urls.py` + `views.py` + `serializers.py`) handles HTTP concerns. The **service layer** (`services.py`) owns all business logic — services are classes that take repository dependencies in the constructor. The **repository layer** (`repositories.py`) owns all ORM queries — also classes. **Models** (`models.py`) define schema only — fields, constraints, `__str__`. No fat models: business logic never lives on the model. All Python code uses type annotations.
 
-**Frontend** — three layers. **Components** own rendering and user interaction. **Services** (`services/`) own business logic and orchestration — classes that take client dependencies in the constructor. **Clients** (`clients/`) wrap Axios calls grouped by API resource — also classes. Components call services, not clients directly. Use JSDoc annotations for type documentation.
+**Frontend** — three layers. **Components** own rendering and user interaction. **Services** (`services/`) own business logic and orchestration — classes that take client dependencies in the constructor. **Clients** (`clients/`) wrap Axios calls grouped by API resource — also classes. Components call services, not clients directly. Use TypeScript types for component props, service methods, and client signatures.
 
 All API endpoints live under `/api/` with no trailing slashes. One Django app (`meals`) owns the entire domain.
 
@@ -44,9 +44,9 @@ See [docs/architecture.md](docs/architecture.md) for the full version.
 
 ## Coding Conventions
 
-**Naming**: No abbreviations. Name with intent — encode the specific role in the name so readers don't have to scan the body. Python uses `snake_case` for variables/functions, `PascalCase` for classes. JavaScript uses `camelCase` for variables/functions, `PascalCase` for components and classes.
+**Naming**: No abbreviations. Name with intent — encode the specific role in the name so readers don't have to scan the body. Python uses `snake_case` for variables/functions, `PascalCase` for classes. TypeScript uses `camelCase` for variables/functions, `PascalCase` for components, classes, types, and interfaces.
 
-**Type annotations**: All Python code uses type hints (`def method(self, name: str) -> MealPlan:`). All JavaScript uses JSDoc annotations for function signatures and class methods. Don't leave types implied.
+**Type annotations**: All Python code uses type hints (`def method(self, name: str) -> MealPlan:`). All TypeScript uses explicit types for function signatures, class methods, and exported values. Don't leave types implied.
 
 **Comments**: Default to none. Add one only when the *why* is non-obvious (e.g., a Day.js week-start quirk). If you need a comment to explain what code does, rename the identifier instead.
 
@@ -60,7 +60,9 @@ See [docs/coding_conventions.md](docs/coding_conventions.md) for the full versio
 
 **Backend**: `APITestCase` tests that exercise behaviour through the API. Test the HTTP response and database state, not internal helpers. Use `factory_boy` factories (`meals/factories.py`) to create test data inline — no shared `setUp`, no helper methods. Don't mock the database.
 
-**Frontend**: React Testing Library + Jest. Test component behaviour from the user's perspective — what's rendered, what happens on click. Use factory functions (`buildDateRangeBarProps()`, `buildMeal()`) instead of shared `baseProps` objects — each call returns fresh data with independent `jest.fn()` mocks. Test files live next to the component (`MealCell.js` + `MealCell.test.js`). Prefer accessible queries (`getByRole`, `getByLabelText`, `getByText`). No snapshot tests.
+**Frontend**: React Testing Library + Jest. Test component behaviour from the user's perspective — what's rendered, what happens on click. Use factory functions (`buildDateRangeBarProps()`, `buildMeal()`) instead of shared `baseProps` objects — each call returns fresh data with independent `jest.fn()` mocks. Test files live next to the component (`MealCell.tsx` + `MealCell.test.tsx`). Prefer accessible queries (`getByRole`, `getByLabelText`, `getByText`). No snapshot tests.
+
+**End-to-end**: Playwright (TypeScript) drives a headless browser against a production-like stack (real backend + frontend + Postgres). This is a separate runner from the Jest + React Testing Library component tests above.
 
 ```bash
 # Run backend tests (from backend/)
