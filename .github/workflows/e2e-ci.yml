@@ -1,0 +1,41 @@
+name: End-to-End Tests
+
+on:
+  push:
+    paths:
+      - "e2e/**"
+      - "frontend/**"
+      - "backend/**"
+      - ".github/workflows/e2e-ci.yml"
+  pull_request:
+    paths:
+      - "e2e/**"
+      - "frontend/**"
+      - "backend/**"
+      - ".github/workflows/e2e-ci.yml"
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run end-to-end suite
+        # NOTE: This step is intentionally non-blocking (continue-on-error: true).
+        # The suite currently contains tests that are expected to fail: they encode
+        # the desired behaviour for a known redirect-loop bug. Once that bug is fixed,
+        # remove continue-on-error and mark this job as a required check.
+        continue-on-error: true
+        run: docker compose -f docker-compose.e2e.yml run --rm e2e
+
+      - name: Upload Playwright traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: e2e/test-results/
+          if-no-files-found: ignore

@@ -1,23 +1,78 @@
-# Docker Compose override for the end-to-end fixture test suite.
+# Docker Compose for the end-to-end test suite.
 #
-# This file is used by `make e2e` and runs only the Playwright harness tests
-# against static fixture HTML pages — no backend or frontend service needed.
+# Runs a production-like stack: real Django backend + built React frontend served
+# by nginx + the Playwright runner. The e2e runner also serves static fixtures on
+# :9999 for the harness tests (which hardcode http://localhost:9999 directly in
+# their BrowserSession construction).
 #
-# When the business-layer PR adds tests against the real app stack, this file
-# will grow to include the backend, frontend, and Postgres services.
+# The e2e container uses network_mode: host (inherited from the fixture-only
+# harness) so it can reach localhost:9999. The backend and web services therefore
+# publish ports to the host so the e2e runner can reach them at
+# localhost:${BACKEND_PORT} and localhost:${WEB_PORT} respectively.
+#
+# Usage (from repo root):
+#   scripts/isolate-env-vars.sh make e2e
 
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        uv run python manage.py migrate --noinput &&
+        uv run python manage.py runserver 0.0.0.0:8000
+      "
+    environment:
+      SECRET_KEY: "e2e-insecure-secret-key-not-for-production"
+      DEBUG: "true"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      CORS_ALLOWED_ORIGINS: "http://localhost:${WEB_PORT:-80}"
+      CSRF_TRUSTED_ORIGINS: "http://localhost:${WEB_PORT:-80}"
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.e2e
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-80}:80"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q --spider http://localhost:80/ 2>/dev/null && echo ok"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 10s
+
   e2e:
     build:
       context: ./e2e
       dockerfile: Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+      web:
+        condition: service_healthy
     environment:
-      E2E_FIXTURE_SERVER: "true"
-      # The fixture HTTP server runs on port 9999 inside the container.
-      E2E_BASE_URL: "http://localhost:9999"
+      # E2E_FIXTURE_SERVER=false so global-setup and the app tests are active.
+      # The harness tests bypass E2E_BASE_URL and connect to localhost:9999 directly.
+      E2E_FIXTURE_SERVER: "false"
+      # App tests navigate to the web service (nginx + React build + /api proxy).
+      E2E_BASE_URL: "http://localhost:${WEB_PORT:-80}"
+      # createTestUser registers users against the backend via the same-origin proxy.
+      E2E_API_URL: "http://localhost:${WEB_PORT:-80}/api"
       CI: "${CI:-}"
-    # http-server serves the fixtures directory on :9999 for the test run.
-    # Playwright config starts it automatically when E2E_FIXTURE_SERVER=true.
+    # Start the fixture HTTP server on :9999 for harness tests, then run Playwright.
     command: >
       sh -c "
         npx http-server /e2e/fixtures -p 9999 --silent &
