@@ -1,0 +1,27 @@
+# Docker Compose override for the end-to-end fixture test suite.
+#
+# This file is used by `make e2e` and runs only the Playwright harness tests
+# against static fixture HTML pages — no backend or frontend service needed.
+#
+# When the business-layer PR adds tests against the real app stack, this file
+# will grow to include the backend, frontend, and Postgres services.
+
+services:
+  e2e:
+    build:
+      context: ./e2e
+      dockerfile: Dockerfile
+    environment:
+      E2E_FIXTURE_SERVER: "true"
+      # The fixture HTTP server runs on port 9999 inside the container.
+      E2E_BASE_URL: "http://localhost:9999"
+      CI: "${CI:-}"
+    # http-server serves the fixtures directory on :9999 for the test run.
+    # Playwright config starts it automatically when E2E_FIXTURE_SERVER=true.
+    command: >
+      sh -c "
+        npx http-server /e2e/fixtures -p 9999 --silent &
+        sleep 1 &&
+        npx playwright test
+      "
+    network_mode: host

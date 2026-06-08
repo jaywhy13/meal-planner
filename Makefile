@@ -33,3 +33,12 @@ lambda-run-local:
 
 lambda-ssh:
 	docker run -it -v $(PWD)/backend:/var/task --entrypoint sh meal-planner-local
+
+# ── End-to-end tests ──────────────────────────────────────────────────────────
+# Runs the Playwright harness tests against static fixture HTML pages.
+# Wrap with scripts/isolate-env-vars.sh when running from a git worktree so
+# the container name and port allocations do not collide with other worktrees.
+#
+#   scripts/isolate-env-vars.sh make e2e
+e2e:
+	docker-compose -f docker-compose.e2e.yml run --rm e2e
