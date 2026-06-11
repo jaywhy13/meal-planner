@@ -21,7 +21,7 @@ import {
 import { AutoAwesome, Settings, Save, Delete } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
+import { mealPlansAPI, foodsAPI, mealsAPI, dailyMealsAPI, mealSettingsAPI } from '../services/api';
 import MealSettings from './MealSettings';
 import { FOOD_CATEGORIES } from '../constants/foodCategories';
 import { colors, semantic, shadows } from '../theme/tokens';
@@ -31,6 +31,7 @@ import { WeekGridMeal } from './mealPlanDetail/MealCell';
 import type {
   DailyMeal,
   Food,
+  Meal,
   MealPlan,
   MealSettings as MealSettingsData,
   MealType,
@@ -134,13 +135,26 @@ const MealPlanDetail = (): React.ReactElement => {
       })
     : MEAL_TYPES;
 
+  const gridPositionFor = (dailyMealDate: string): { week: number; day: number } => {
+    const daysFromWeek1 = dayjs(dailyMealDate).startOf('day').diff(week1Start, 'day');
+    return {
+      week: Math.floor(daysFromWeek1 / 7) + 1,
+      day: (daysFromWeek1 % 7) + 1,
+    };
+  };
+
   const mealsForCurrentWeek: WeekGridMeal[] = dailyMeals
-    .filter((meal) => meal.week === currentWeek)
-    .map((meal) => ({
-      id: meal.id,
-      day: meal.day ?? 0,
-      meal_type: meal.meal_type,
-      foods: meal.foods,
+    .filter((dailyMeal) => dailyMeal.date != null)
+    .map((dailyMeal) => ({
+      dailyMeal,
+      position: gridPositionFor(dailyMeal.date as string),
+    }))
+    .filter(({ position }) => position.week === currentWeek)
+    .map(({ dailyMeal, position }) => ({
+      id: dailyMeal.id,
+      day: position.day,
+      meal_type: dailyMeal.meal_type,
+      foods: dailyMeal.meal?.foods ?? [],
     }));
 
   const openAddDialog = ({ day, mealType }: AddMealRequest): void => {
@@ -159,8 +173,8 @@ const MealPlanDetail = (): React.ReactElement => {
     setSelectedDay(meal.day);
     setSelectedMealType(meal.meal_type);
     setSelectedFoods(meal.foods || []);
-    const sourceMeal = dailyMeals.find((existing) => existing.id === meal.id);
-    setNotes(sourceMeal?.notes || '');
+    const sourceDailyMeal = dailyMeals.find((existing) => existing.id === meal.id);
+    setNotes(sourceDailyMeal?.meal?.notes || '');
     setNewFoodName('');
     setNewFoodCategory('');
     setOpenDialog(true);
@@ -179,24 +193,41 @@ const MealPlanDetail = (): React.ReactElement => {
 
   const handleSaveMeal = async (): Promise<void> => {
     try {
-      const mealData = {
+      const slotDate = weekStart.add(selectedDay - 1, 'day').format('YYYY-MM-DD');
+      const savedMeal = await saveMealForSlot(slotDate);
+      const dailyMealData = {
         meal_plan: id,
-        week: currentWeek,
-        day: selectedDay,
+        date: slotDate,
         meal_type: selectedMealType,
-        food_ids: selectedFoods.map((food) => food.id),
-        notes,
+        meal_id: savedMeal.id,
       };
       if (editingMeal) {
-        await dailyMealsAPI.update(editingMeal.id, mealData);
+        await dailyMealsAPI.update(editingMeal.id, dailyMealData);
       } else {
-        await dailyMealsAPI.create(mealData);
+        await dailyMealsAPI.create(dailyMealData);
       }
       await fetchDailyMeals();
       setOpenDialog(false);
     } catch (caughtError) {
       setError('Failed to save meal');
     }
+  };
+
+  const saveMealForSlot = async (slotDate: string): Promise<Meal> => {
+    const mealData = {
+      name: `${selectedMealType} on ${slotDate}`,
+      food_ids: selectedFoods.map((food) => food.id),
+      notes,
+    };
+    const existingMeal = editingMeal
+      ? dailyMeals.find((existing) => existing.id === editingMeal.id)?.meal
+      : null;
+    if (existingMeal) {
+      const response = await mealsAPI.update(existingMeal.id, mealData);
+      return response.data;
+    }
+    const response = await mealsAPI.create(mealData);
+    return response.data;
   };
 
   const handleDeleteMeal = async (): Promise<void> => {

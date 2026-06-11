@@ -1,11 +1,37 @@
 from rest_framework import serializers
-from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, DailyMeal, Meal, MealSuggestion, MealSettings
 
 
 class FoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food
         fields = ["id", "name", "category", "created_at"]
+
+
+class MealSerializer(serializers.ModelSerializer):
+    foods = FoodSerializer(many=True, read_only=True)
+    food_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Food.objects.all(), source="foods", many=True, write_only=True, required=False
+    )
+
+    class Meta:
+        model = Meal
+        fields = ["id", "name", "foods", "food_ids", "notes", "created_at", "updated_at"]
+
+    def create(self, validated_data):
+        foods = validated_data.pop("foods", [])
+        meal = Meal.objects.create(**validated_data)
+        meal.foods.set(foods)
+        return meal
+
+    def update(self, instance, validated_data):
+        foods = validated_data.pop("foods", None)
+        for attribute, value in validated_data.items():
+            setattr(instance, attribute, value)
+        instance.save()
+        if foods is not None:
+            instance.foods.set(foods)
+        return instance
 
 
 class MealSuggestionSerializer(serializers.ModelSerializer):
@@ -17,31 +43,15 @@ class MealSuggestionSerializer(serializers.ModelSerializer):
 
 
 class DailyMealSerializer(serializers.ModelSerializer):
-    foods = FoodSerializer(many=True, read_only=True)
-    food_ids = serializers.PrimaryKeyRelatedField(
-        queryset=Food.objects.all(), source="foods", many=True, write_only=True
+    meal = MealSerializer(read_only=True)
+    meal_id = serializers.PrimaryKeyRelatedField(
+        queryset=Meal.objects.all(), source="meal", write_only=True, required=False, allow_null=True
     )
     day_of_week = serializers.ReadOnlyField()
 
     class Meta:
         model = DailyMeal
-        fields = ["id", "meal_plan", "date", "day_of_week", "meal_type", "foods", "food_ids", "notes"]
-
-    def create(self, validated_data):
-        print("Received data:", validated_data)
-        foods = validated_data.pop("foods", [])
-        print("After popping foods:", validated_data)
-        daily_meal = DailyMeal.objects.create(**validated_data)
-        daily_meal.foods.set(foods)
-        return daily_meal
-
-    def update(self, instance, validated_data):
-        foods = validated_data.pop("foods", [])
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        instance.foods.set(foods)
-        return instance
+        fields = ["id", "meal_plan", "date", "day_of_week", "meal_type", "meal", "meal_id"]
 
 
 class MealSettingsSerializer(serializers.ModelSerializer):
