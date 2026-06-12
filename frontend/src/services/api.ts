@@ -3,6 +3,7 @@ import api from '../clients/api';
 import type {
   DailyMeal,
   Food,
+  Meal,
   MealPlan,
   MealPlanSummary,
   MealSettings,
@@ -24,14 +25,19 @@ export interface CreateFoodInput {
 
 export type UpdateFoodInput = Partial<CreateFoodInput>;
 
-export interface CreateDailyMealInput {
-  meal_plan: number | string;
-  date?: string;
-  week?: number;
-  day?: number;
-  meal_type: MealType;
+export interface CreateMealInput {
+  name: string;
   food_ids: number[];
   notes?: string;
+}
+
+export type UpdateMealInput = Partial<CreateMealInput>;
+
+export interface CreateDailyMealInput {
+  meal_plan: number | string;
+  date: string;
+  meal_type: MealType;
+  meal_id: number | null;
 }
 
 export type UpdateDailyMealInput = Partial<CreateDailyMealInput>;
@@ -86,6 +92,16 @@ export const dailyMealsAPI = {
   update: (id: number | string, data: UpdateDailyMealInput): Promise<AxiosResponse<DailyMeal>> =>
     api.put(`/daily-meals/${id}`, data),
   delete: (id: number | string): Promise<AxiosResponse<void>> => api.delete(`/daily-meals/${id}`),
+};
+
+export const mealsAPI = {
+  getAll: (nameSearch?: string): Promise<AxiosResponse<Meal[]>> =>
+    api.get(nameSearch ? `/meals?q=${encodeURIComponent(nameSearch)}` : '/meals'),
+  getById: (id: number | string): Promise<AxiosResponse<Meal>> => api.get(`/meals/${id}`),
+  create: (data: CreateMealInput): Promise<AxiosResponse<Meal>> => api.post('/meals', data),
+  update: (id: number | string, data: UpdateMealInput): Promise<AxiosResponse<Meal>> =>
+    api.patch(`/meals/${id}`, data),
+  delete: (id: number | string): Promise<AxiosResponse<void>> => api.delete(`/meals/${id}`),
 };
 
 export const mealSuggestionsAPI = {

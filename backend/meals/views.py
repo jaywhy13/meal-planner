@@ -1,24 +1,29 @@
-import calendar
-from datetime import date, timedelta
-
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Q
 from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
 from .serializers import (
     MealPlanSerializer,
     MealPlanListSerializer,
     FoodSerializer,
     DailyMealSerializer,
+    MealSerializer,
     MealSuggestionSerializer,
     MealSettingsSerializer,
 )
-from .services import DailyMealService, MealPlanService, MealSettingsService
+from .services import (
+    DailyMealService,
+    MealPlanGenerationService,
+    MealPlanService,
+    MealService,
+    MealSettingsService,
+)
 
 meal_plan_service = MealPlanService()
+meal_plan_generation_service = MealPlanGenerationService()
+meal_service = MealService()
 daily_meal_service = DailyMealService()
 meal_settings_service = MealSettingsService()
 
@@ -43,59 +48,26 @@ class MealPlanViewSet(viewsets.ModelViewSet):
         """Generate meals for the full calendar month of the plan's start_date"""
         meal_plan = self.get_object()
         wipe = request.data.get("wipe", False)
-
-        meal_settings, _ = MealSettings.objects.get_or_create(meal_plan=meal_plan)
-        suggestions = MealSuggestion.objects.filter(is_healthy=True)
-
-        if wipe:
-            meal_plan.daily_meals.all().delete()
-
-        # Map ISO weekday (1-7) to MealSettings field name
-        day_field_map = {
-            1: "monday_enabled",
-            2: "tuesday_enabled",
-            3: "wednesday_enabled",
-            4: "thursday_enabled",
-            5: "friday_enabled",
-            6: "saturday_enabled",
-            7: "sunday_enabled",
-        }
-
-        enabled_meal_types = [
-            mt
-            for mt, field in [
-                ("breakfast", "breakfast_enabled"),
-                ("lunch", "lunch_enabled"),
-                ("dinner", "dinner_enabled"),
-                ("snack", "snack_enabled"),
-            ]
-            if getattr(meal_settings, field)
-        ]
-
-        start = meal_plan.start_date.replace(day=1)
-        _, days_in_month = calendar.monthrange(start.year, start.month)
-
-        for offset in range(days_in_month):
-            current_date = start + timedelta(days=offset)
-            day_field = day_field_map[current_date.isoweekday()]
-            if not getattr(meal_settings, day_field):
-                continue
-
-            for meal_type in enabled_meal_types:
-                meal, created = DailyMeal.objects.get_or_create(
-                    meal_plan=meal_plan,
-                    date=current_date,
-                    meal_type=meal_type,
-                )
-                if created and suggestions.exists():
-                    suggestion = suggestions.filter(meal_type=meal_type).first()
-                    if suggestion:
-                        meal.foods.set(suggestion.foods.all())
-                        meal.notes = suggestion.description
-                        meal.save()
-
+        meal_plan_generation_service.generate(meal_plan, wipe=wipe)
         serializer = self.get_serializer(meal_plan)
         return Response(serializer.data)
+
+
+class MealViewSet(viewsets.ModelViewSet):
+    serializer_class = MealSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        name = self.request.query_params.get("q")
+        return meal_service.list_for_user(self.request.user.id, name=name)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        if serializer.instance.user != self.request.user:
+            raise PermissionDenied("You do not own this meal.")
+        serializer.save()
 
 
 class FoodViewSet(viewsets.ModelViewSet):
