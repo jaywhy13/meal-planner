@@ -15,7 +15,7 @@ router.register(r"meal-plans", MealPlanViewSet)
 router.register(r"meals", MealViewSet, basename="meal")
 router.register(r"foods", FoodViewSet)
 router.register(r"daily-meals", DailyMealViewSet)
-router.register(r"meal-suggestions", MealSuggestionViewSet)
+router.register(r"meal-suggestions", MealSuggestionViewSet, basename="mealsuggestion")
 router.register(r"meal-settings", MealSettingsViewSet)
 
 urlpatterns = [

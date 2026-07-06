@@ -12,6 +12,7 @@ from .repositories import (
     MealRepository,
     MealSettingsData,
     MealSettingsRepository,
+    MealSuggestionData,
     MealSuggestionRepository,
 )
 
@@ -73,9 +74,7 @@ class DailyMealService:
         daily meal is left untouched. Public so other flows (imports,
         background jobs) can reuse it, not just generation.
         """
-        daily_meal, created = self.daily_meal_repository.get_or_create(
-            meal_plan, meal_date, meal_type
-        )
+        daily_meal, created = self.daily_meal_repository.get_or_create(meal_plan, meal_date, meal_type)
         if created and meal is not None:
             daily_meal.meal = meal
             self.daily_meal_repository.save(daily_meal)
@@ -129,9 +128,7 @@ class MealPlanGenerationService:
         meal_by_suggestion_id: dict[int, Meal],
     ) -> None:
         meal = self._suggested_meal(meal_plan, meal_type, meal_by_suggestion_id)
-        self.daily_meal_service.get_or_create_daily_meal(
-            meal_plan, current_date, meal_type, meal=meal
-        )
+        self.daily_meal_service.get_or_create_daily_meal(meal_plan, current_date, meal_type, meal=meal)
 
     def _suggested_meal(
         self,
@@ -139,9 +136,7 @@ class MealPlanGenerationService:
         meal_type: str,
         meal_by_suggestion_id: dict[int, Meal],
     ) -> Meal | None:
-        suggestion = self.meal_suggestion_repository.list(
-            meal_type=meal_type, is_healthy=True
-        ).first()
+        suggestion = self.meal_suggestion_repository.list(meal_type=meal_type, is_healthy=True).first()
         if suggestion is None:
             return None
 
@@ -150,6 +145,20 @@ class MealPlanGenerationService:
             meal = self.daily_meal_service.meal_from_suggestion(meal_plan, suggestion)
             meal_by_suggestion_id[suggestion.id] = meal
         return meal
+
+
+class MealSuggestionService:
+    def __init__(
+        self,
+        meal_suggestion_repository: MealSuggestionRepository | None = None,
+    ) -> None:
+        self.meal_suggestion_repository = meal_suggestion_repository or MealSuggestionRepository()
+
+    def list_healthy(self, meal_type: str | None = None) -> list[MealSuggestionData]:
+        return self.meal_suggestion_repository.list_data(meal_type=meal_type, is_healthy=True)
+
+    def get(self, suggestion_id: int) -> MealSuggestionData | None:
+        return self.meal_suggestion_repository.get_data(suggestion_id)
 
 
 class MealSettingsService:

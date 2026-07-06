@@ -9,9 +9,7 @@ from meals.models import MealType
 
 class DailyMealModelTests(TestCase):
     def test_monday_sets_day_of_week_1(self):
-        daily_meal = DailyMealFactory(
-            date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST
-        )
+        daily_meal = DailyMealFactory(date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST)
         self.assertEqual(daily_meal.day_of_week, 1)
 
     def test_sunday_sets_day_of_week_7(self):
@@ -22,6 +20,4 @@ class DailyMealModelTests(TestCase):
         plan = MealPlanFactory()
         DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.DINNER)
         with self.assertRaises(IntegrityError):
-            DailyMealFactory(
-                meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.DINNER
-            )
+            DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.DINNER)

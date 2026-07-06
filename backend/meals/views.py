@@ -1,9 +1,9 @@
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, DailyMeal, MealSettings
 from .serializers import (
     MealPlanSerializer,
     MealPlanListSerializer,
@@ -19,6 +19,7 @@ from .services import (
     MealPlanService,
     MealService,
     MealSettingsService,
+    MealSuggestionService,
 )
 
 meal_plan_service = MealPlanService()
@@ -26,6 +27,7 @@ meal_plan_generation_service = MealPlanGenerationService()
 meal_service = MealService()
 daily_meal_service = DailyMealService()
 meal_settings_service = MealSettingsService()
+meal_suggestion_service = MealSuggestionService()
 
 
 class MealPlanViewSet(viewsets.ModelViewSet):
@@ -107,21 +109,30 @@ class DailyMealViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class MealSuggestionViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = MealSuggestion.objects.all()
-    serializer_class = MealSuggestionSerializer
+class MealSuggestionViewSet(viewsets.ViewSet):
+    """Plain ViewSet: `meal_suggestion_service` returns `MealSuggestionData` value
+    objects only, never ORM `MealSuggestion` instances or querysets."""
+
     permission_classes = [AllowAny]
+
+    def list(self, request):
+        suggestions = meal_suggestion_service.list_healthy()
+        serializer = MealSuggestionSerializer(suggestions, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        suggestion = meal_suggestion_service.get(int(pk))
+        if suggestion is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = MealSuggestionSerializer(suggestion)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
     def by_meal_type(self, request):
         """Get suggestions filtered by meal type"""
         meal_type = request.query_params.get("meal_type")
-        if meal_type:
-            suggestions = MealSuggestion.objects.filter(meal_type=meal_type, is_healthy=True)
-        else:
-            suggestions = MealSuggestion.objects.filter(is_healthy=True)
-
-        serializer = self.get_serializer(suggestions, many=True)
+        suggestions = meal_suggestion_service.list_healthy(meal_type=meal_type)
+        serializer = MealSuggestionSerializer(suggestions, many=True)
         return Response(serializer.data)
 
 
