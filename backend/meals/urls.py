@@ -13,7 +13,7 @@ from .views import (
 router = DefaultRouter(trailing_slash=False)
 router.register(r"meal-plans", MealPlanViewSet)
 router.register(r"meals", MealViewSet, basename="meal")
-router.register(r"foods", FoodViewSet)
+router.register(r"foods", FoodViewSet, basename="food")
 router.register(r"daily-meals", DailyMealViewSet)
 router.register(r"meal-suggestions", MealSuggestionViewSet, basename="mealsuggestion")
 router.register(r"meal-settings", MealSettingsViewSet)

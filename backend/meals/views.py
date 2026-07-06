@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .models import MealPlan, Food, DailyMeal, MealSettings
+from .models import MealPlan, DailyMeal, MealSettings
 from .serializers import (
     MealPlanSerializer,
     MealPlanListSerializer,
@@ -15,6 +15,7 @@ from .serializers import (
 )
 from .services import (
     DailyMealService,
+    FoodService,
     MealPlanGenerationService,
     MealPlanService,
     MealService,
@@ -28,6 +29,7 @@ meal_service = MealService()
 daily_meal_service = DailyMealService()
 meal_settings_service = MealSettingsService()
 meal_suggestion_service = MealSuggestionService()
+food_service = FoodService()
 
 
 class MealPlanViewSet(viewsets.ModelViewSet):
@@ -72,21 +74,68 @@ class MealViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class FoodViewSet(viewsets.ModelViewSet):
-    queryset = Food.objects.all()
-    serializer_class = FoodSerializer
+class FoodViewSet(viewsets.ViewSet):
+    """Plain ViewSet: `food_service` returns `FoodData` value objects only,
+    never ORM `Food` instances or querysets."""
+
     permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        foods = food_service.list_all()
+        serializer = FoodSerializer(foods, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        food = food_service.get(int(pk))
+        if food is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = FoodSerializer(food)
+        return Response(serializer.data)
+
+    def create(self, request):
+        serializer = FoodSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        food = food_service.create(
+            name=serializer.validated_data["name"],
+            category=serializer.validated_data["category"],
+        )
+        return Response(FoodSerializer(food).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        serializer = FoodSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        food = food_service.update(
+            int(pk),
+            name=serializer.validated_data["name"],
+            category=serializer.validated_data["category"],
+        )
+        if food is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(FoodSerializer(food).data)
+
+    def partial_update(self, request, pk=None):
+        existing_food = food_service.get(int(pk))
+        if existing_food is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = FoodSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        name = serializer.validated_data.get("name", existing_food.name)
+        category = serializer.validated_data.get("category", existing_food.category)
+        food = food_service.update(int(pk), name=name, category=category)
+        return Response(FoodSerializer(food).data)
+
+    def destroy(self, request, pk=None):
+        deleted = food_service.delete(int(pk))
+        if not deleted:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["get"])
     def search(self, request):
         """Search foods by name"""
         query = request.query_params.get("q", "")
-        if query:
-            foods = Food.objects.filter(name__icontains=query)[:10]
-        else:
-            foods = Food.objects.all()[:10]
-
-        serializer = self.get_serializer(foods, many=True)
+        foods = food_service.search(query)
+        serializer = FoodSerializer(foods, many=True)
         return Response(serializer.data)
 
 

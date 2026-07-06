@@ -2,10 +2,15 @@ from rest_framework import serializers
 from .models import MealPlan, Food, DailyMeal, Meal, MealSettings
 
 
-class FoodSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Food
-        fields = ["id", "name", "category", "created_at"]
+class FoodSerializer(serializers.Serializer):
+    """Serializes `FoodData` value objects. Also used nested (read-only) under
+    `MealSerializer`/`MealSuggestionSerializer`, where attribute access works
+    just as well against ORM `Food` instances."""
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=200)
+    category = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    created_at = serializers.DateTimeField(read_only=True)
 
 
 class MealSuggestionSerializer(serializers.Serializer):
