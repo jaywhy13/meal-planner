@@ -37,7 +37,11 @@ api.interceptors.response.use(
         await api.post(TOKEN_REFRESH_PATH);
         return api(originalRequest);
       } catch {
-        window.location.href = '/login';
+        // Check if we're already on the login page to prevent redirect loops
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/login') {
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
     }
