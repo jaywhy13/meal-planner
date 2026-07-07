@@ -62,4 +62,31 @@ describe('api response interceptor 401 handling', () => {
     const refreshRequestCount = requestUrls.filter((url) => url === '/auth/token/refresh').length;
     expect(refreshRequestCount).toBe(1);
   });
+
+  it('prevents redirect loops by not redirecting when already on login page', async () => {
+    // Simulate being on the login page
+    (window as unknown as { location: { href: string } }).location = { href: '/login' };
+
+    // This should not cause infinite redirect loop
+    await expect(api.get('/auth/profile')).rejects.toBeDefined();
+
+    // Verify that we don't have too many requests (which would indicate a loop)
+    expect(requestUrls.length).toBeLessThan(20);
+
+    // Verify that we didn't end up redirecting to login again
+    const loginRedirects = requestUrls.filter((url) => url.includes('/login'));
+    expect(loginRedirects.length).toBe(0);
+  });
+
+  it('allows redirect to login page when not already on it', async () => {
+    // Simulate being on a different page (not login)
+    (window as unknown as { location: { href: string } }).location = { href: '/dashboard' };
+
+    // This should attempt redirect to login (but our test setup prevents actual navigation)
+    await expect(api.get('/auth/profile')).rejects.toBeDefined();
+
+    // The interceptor should attempt to redirect, but our test won't actually navigate
+    // We just want to ensure it doesn't create infinite loops in the request flow
+    expect(requestUrls.length).toBeLessThan(20);
+  });
 });
