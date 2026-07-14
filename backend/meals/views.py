@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from .models import MealPlan, DailyMeal, MealSettings
 from .serializers import (
     MealPlanSerializer,
     MealPlanListSerializer,
@@ -33,7 +32,6 @@ food_service = FoodService()
 
 
 class MealPlanViewSet(viewsets.ModelViewSet):
-    queryset = MealPlan.objects.all()
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
@@ -140,7 +138,6 @@ class FoodViewSet(viewsets.ViewSet):
 
 
 class DailyMealViewSet(viewsets.ModelViewSet):
-    queryset = DailyMeal.objects.all()
     serializer_class = DailyMealSerializer
     permission_classes = [IsAuthenticated]
 
@@ -186,7 +183,6 @@ class MealSuggestionViewSet(viewsets.ViewSet):
 
 
 class MealSettingsViewSet(viewsets.ModelViewSet):
-    queryset = MealSettings.objects.all()
     serializer_class = MealSettingsSerializer
     permission_classes = [IsAuthenticated]
 
