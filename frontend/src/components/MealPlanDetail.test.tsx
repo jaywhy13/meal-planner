@@ -1,13 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import MealPlanDetail from './MealPlanDetail';
-import {
-  mealPlansAPI,
-  foodsAPI,
-  dailyMealsAPI,
-  mealsAPI,
-  mealSettingsAPI,
-} from '../services/api';
+import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealsAPI, mealSettingsAPI } from '../services/api';
 import type { Food, Meal, MealPlan } from '../types';
 
 jest.mock('../services/api');
@@ -88,9 +82,7 @@ describe('MealPlanDetail save flow', () => {
     fireEvent.click(screen.getByRole('button', { name: /^save$/i }));
 
     await waitFor(() => expect(mockedMealsAPI.create).toHaveBeenCalledTimes(1));
-    expect(mockedMealsAPI.create).toHaveBeenCalledWith(
-      expect.objectContaining({ food_ids: [1] })
-    );
+    expect(mockedMealsAPI.create).toHaveBeenCalledWith(expect.objectContaining({ food_ids: [1] }));
 
     await waitFor(() => expect(mockedDailyMealsAPI.create).toHaveBeenCalledTimes(1));
     expect(mockedDailyMealsAPI.create).toHaveBeenCalledWith(
