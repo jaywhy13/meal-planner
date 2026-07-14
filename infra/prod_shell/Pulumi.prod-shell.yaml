@@ -1,0 +1,6 @@
+config:
+  aws:
+    account_id: "879100528238"
+  prod-shell:
+    vpc_id: "vpc-52d59c37"
+    subnet_id: "subnet-74f4565f"
