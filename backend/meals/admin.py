@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MealPlan, Food, DailyMeal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, DailyMeal, Meal, MealSuggestion, MealSettings
 
 
 @admin.register(MealPlan)
@@ -17,16 +17,20 @@ class FoodAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at"]
 
 
-@admin.register(DailyMeal)
-class DailyMealAdmin(admin.ModelAdmin):
-    list_display = ["meal_plan", "date", "day_of_week", "meal_type", "foods_display"]
-    list_filter = ["meal_type", "day_of_week", "meal_plan"]
-    search_fields = ["meal_plan__name", "notes"]
+@admin.register(Meal)
+class MealAdmin(admin.ModelAdmin):
+    list_display = ["name", "user", "created_at", "updated_at"]
+    list_filter = ["user"]
+    search_fields = ["name", "notes"]
+    readonly_fields = ["created_at", "updated_at"]
     filter_horizontal = ["foods"]
 
-    @admin.display(description="Foods")
-    def foods_display(self, obj):
-        return ", ".join([food.name for food in obj.foods.all()])
+
+@admin.register(DailyMeal)
+class DailyMealAdmin(admin.ModelAdmin):
+    list_display = ["meal_plan", "date", "day_of_week", "meal_type", "meal"]
+    list_filter = ["meal_type", "day_of_week", "meal_plan"]
+    search_fields = ["meal_plan__name", "meal__name"]
 
 
 @admin.register(MealSettings)
