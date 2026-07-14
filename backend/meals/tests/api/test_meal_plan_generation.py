@@ -58,9 +58,7 @@ class GenerateMealPlanTests(APITestCase):
         user = UserFactory()
         self.client.force_authenticate(user=user)
         plan = MealPlanFactory(user=user, start_date=datetime.date(2026, 5, 1))
-        pre_existing = DailyMealFactory(
-            meal_plan=plan, date=datetime.date(2026, 5, 1), meal_type=MealType.BREAKFAST
-        )
+        pre_existing = DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 1), meal_type=MealType.BREAKFAST)
 
         response = self.client.post(self._generate_url(plan), {"wipe": True}, format="json")
 
@@ -72,9 +70,7 @@ class GenerateMealPlanTests(APITestCase):
         user = UserFactory()
         self.client.force_authenticate(user=user)
         plan = MealPlanFactory(user=user, start_date=datetime.date(2026, 5, 1))
-        pre_existing = DailyMealFactory(
-            meal_plan=plan, date=datetime.date(2026, 5, 1), meal_type=MealType.BREAKFAST
-        )
+        pre_existing = DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 1), meal_type=MealType.BREAKFAST)
 
         response = self.client.post(self._generate_url(plan), {"wipe": False}, format="json")
 

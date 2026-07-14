@@ -41,18 +41,14 @@ class MealSettingsDataTests(SimpleTestCase):
 
     def test_get_enabled_days_skips_disabled_weekdays(self):
         settings = build_meal_settings_data(saturday_enabled=False, sunday_enabled=False)
-        enabled_days = settings.get_enabled_days(
-            datetime.date(2026, 5, 1), datetime.date(2026, 5, 7)
-        )
+        enabled_days = settings.get_enabled_days(datetime.date(2026, 5, 1), datetime.date(2026, 5, 7))
         weekdays = {day.isoweekday() for day in enabled_days}
         self.assertNotIn(6, weekdays)
         self.assertNotIn(7, weekdays)
 
     def test_get_enabled_days_inclusive_of_bounds(self):
         settings = build_meal_settings_data()
-        enabled_days = settings.get_enabled_days(
-            datetime.date(2026, 5, 1), datetime.date(2026, 5, 3)
-        )
+        enabled_days = settings.get_enabled_days(datetime.date(2026, 5, 1), datetime.date(2026, 5, 3))
         self.assertEqual(
             enabled_days,
             [datetime.date(2026, 5, 1), datetime.date(2026, 5, 2), datetime.date(2026, 5, 3)],

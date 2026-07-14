@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MealPlan, Food, DailyMeal, Meal, MealSuggestion, MealSettings
+from .models import MealPlan, Food, DailyMeal, Meal, MealSettings
 
 
 class FoodSerializer(serializers.ModelSerializer):
@@ -8,12 +8,16 @@ class FoodSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "category", "created_at"]
 
 
-class MealSuggestionSerializer(serializers.ModelSerializer):
-    foods = FoodSerializer(many=True, read_only=True)
+class MealSuggestionSerializer(serializers.Serializer):
+    """Serializes `MealSuggestionData` value objects, never ORM `MealSuggestion` rows."""
 
-    class Meta:
-        model = MealSuggestion
-        fields = ["id", "name", "description", "foods", "meal_type", "is_healthy", "created_at"]
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(max_length=200)
+    description = serializers.CharField(allow_blank=True, required=False, default="")
+    foods = FoodSerializer(many=True, read_only=True)
+    meal_type = serializers.CharField()
+    is_healthy = serializers.BooleanField()
+    created_at = serializers.DateTimeField(read_only=True)
 
 
 class MealSerializer(serializers.ModelSerializer):

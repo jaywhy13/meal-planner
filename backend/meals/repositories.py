@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from typing import List
 
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
@@ -66,6 +67,29 @@ class MealSettingsData:
                 enabled_days.append(current_date)
             current_date += timedelta(days=1)
         return enabled_days
+
+
+@dataclass(frozen=True)
+class FoodData:
+    """A food value object; the only shape that crosses the Food repository boundary."""
+
+    id: int
+    name: str
+    category: str
+    created_at: datetime
+
+
+@dataclass(frozen=True)
+class MealSuggestionData:
+    """A meal suggestion value object, with its foods already resolved to value objects."""
+
+    id: int
+    name: str
+    description: str
+    foods: list[FoodData]
+    meal_type: str
+    is_healthy: bool
+    created_at: datetime
 
 
 class MealPlanRepository:
@@ -169,6 +193,13 @@ class MealSuggestionRepository:
         is_healthy: bool | None = None,
         limit: int | None = None,
     ) -> QuerySet[MealSuggestion]:
+        """Return the ORM queryset directly.
+
+        Kept for `MealPlanGenerationService`, which still walks ORM
+        `MealSuggestion`/`Meal` relationships during generation. This is an
+        accepted, tracked exception to the value-object boundary below —
+        every other caller must use `list_data`/`get_data` instead.
+        """
         queryset: QuerySet[MealSuggestion] = MealSuggestion.objects.all()
         if meal_type is not None:
             queryset = queryset.filter(meal_type=meal_type)
@@ -177,3 +208,37 @@ class MealSuggestionRepository:
         if limit is not None:
             queryset = queryset[:limit]
         return queryset
+
+    def list_data(
+        self,
+        meal_type: str | None = None,
+        is_healthy: bool | None = None,
+    ) -> List[MealSuggestionData]:
+        suggestions = self.list(meal_type=meal_type, is_healthy=is_healthy)
+        return [self._to_data(suggestion) for suggestion in suggestions]
+
+    def get_data(self, suggestion_id: int) -> MealSuggestionData | None:
+        try:
+            suggestion = MealSuggestion.objects.get(id=suggestion_id)
+        except MealSuggestion.DoesNotExist:
+            return None
+        return self._to_data(suggestion)
+
+    def _to_data(self, suggestion: MealSuggestion) -> MealSuggestionData:
+        return MealSuggestionData(
+            id=suggestion.id,
+            name=suggestion.name,
+            description=suggestion.description,
+            foods=[self._to_food_data(food) for food in suggestion.foods.all()],
+            meal_type=suggestion.meal_type,
+            is_healthy=suggestion.is_healthy,
+            created_at=suggestion.created_at,
+        )
+
+    def _to_food_data(self, food: Food) -> FoodData:
+        return FoodData(
+            id=food.id,
+            name=food.name,
+            category=food.category,
+            created_at=food.created_at,
+        )

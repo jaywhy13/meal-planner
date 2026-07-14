@@ -9,16 +9,12 @@ from meals.serializers import DailyMealSerializer
 
 class DailyMealSerializerTests(TestCase):
     def test_serializer_exposes_date(self):
-        daily_meal = DailyMealFactory(
-            date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST
-        )
+        daily_meal = DailyMealFactory(date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST)
         serializer = DailyMealSerializer(daily_meal)
         self.assertEqual(serializer.data["date"], "2026-05-04")
 
     def test_serializer_exposes_day_of_week(self):
-        daily_meal = DailyMealFactory(
-            date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST
-        )
+        daily_meal = DailyMealFactory(date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST)
         serializer = DailyMealSerializer(daily_meal)
         self.assertEqual(serializer.data["day_of_week"], 1)
 

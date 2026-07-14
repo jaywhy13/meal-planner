@@ -52,9 +52,7 @@ class DailyMealMealLinkTests(APITestCase):
         eggs = FoodFactory(name="Eggs")
         meal = MealFactory(user=user, name="Breakfast", foods=[eggs])
         plan = MealPlanFactory(user=user)
-        DailyMealFactory(
-            meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST, meal=meal
-        )
+        DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST, meal=meal)
         daily_meal_list_url = reverse("dailymeal-list")
 
         response = self.client.get(daily_meal_list_url, {"meal_plan": plan.id}, format="json")
@@ -116,9 +114,7 @@ class MealSettingsDayToggleTests(APITestCase):
         settings = MealSettingsFactory(meal_plan=MealPlanFactory(user=user))
         url = reverse("mealsettings-detail", args=[settings.pk])
 
-        response = self.client.patch(
-            url, {"saturday_enabled": False, "sunday_enabled": False}, format="json"
-        )
+        response = self.client.patch(url, {"saturday_enabled": False, "sunday_enabled": False}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(response.data["saturday_enabled"])
@@ -153,9 +149,7 @@ class MealPlanStartDateTests(APITestCase):
         self.client.force_authenticate(user=user)
         url = reverse("mealplan-list")
 
-        response = self.client.post(
-            url, {"name": "Test Plan", "start_date": "2026-05-01"}, format="json"
-        )
+        response = self.client.post(url, {"name": "Test Plan", "start_date": "2026-05-01"}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["start_date"], "2026-05-01")

@@ -60,9 +60,7 @@ class DailyMeal(models.Model):
     date = models.DateField()
     day_of_week = models.PositiveSmallIntegerField(db_index=True)  # ISO weekday: 1=Mon, 7=Sun
     meal_type = models.CharField(max_length=20, choices=MealType.choices)
-    meal = models.ForeignKey(
-        Meal, on_delete=models.SET_NULL, null=True, blank=True, related_name="daily_meals"
-    )
+    meal = models.ForeignKey(Meal, on_delete=models.SET_NULL, null=True, blank=True, related_name="daily_meals")
 
     class Meta:
         unique_together = ["meal_plan", "date", "meal_type"]
