@@ -8,6 +8,8 @@ from django.db.models import QuerySet
 from .models import DailyMeal, Meal, MealPlan, MealSettings, MealSuggestion
 from .repositories import (
     DailyMealRepository,
+    FoodData,
+    FoodRepository,
     MealPlanRepository,
     MealRepository,
     MealSettingsData,
@@ -174,3 +176,35 @@ class MealSettingsService:
         meal_plan_id: int | None = None,
     ) -> QuerySet[MealSettings]:
         return self.meal_settings_repository.for_user(user_id, meal_plan_id)
+
+
+class FoodService:
+    """Owns the search behaviour so blank-query and the result cap live in one place."""
+
+    SEARCH_RESULT_LIMIT = 10
+
+    def __init__(
+        self,
+        food_repository: FoodRepository | None = None,
+    ) -> None:
+        self.food_repository = food_repository or FoodRepository()
+
+    def list_all(self) -> list[FoodData]:
+        return self.food_repository.all()
+
+    def search(self, query: str) -> list[FoodData]:
+        if not query:
+            return self.food_repository.all()[: self.SEARCH_RESULT_LIMIT]
+        return self.food_repository.search(query, limit=self.SEARCH_RESULT_LIMIT)
+
+    def get(self, food_id: int) -> FoodData | None:
+        return self.food_repository.get(food_id)
+
+    def create(self, name: str, category: str) -> FoodData:
+        return self.food_repository.create(name, category)
+
+    def update(self, food_id: int, name: str, category: str) -> FoodData | None:
+        return self.food_repository.update(food_id, name, category)
+
+    def delete(self, food_id: int) -> bool:
+        return self.food_repository.delete(food_id)

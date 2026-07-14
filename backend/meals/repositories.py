@@ -186,6 +186,48 @@ class MealSettingsRepository:
         )
 
 
+class FoodRepository:
+    def all(self) -> List[FoodData]:
+        return [self._to_data(food) for food in Food.objects.all()]
+
+    def search(self, query: str, limit: int = 10) -> List[FoodData]:
+        foods = Food.objects.filter(name__icontains=query)[:limit]
+        return [self._to_data(food) for food in foods]
+
+    def get(self, food_id: int) -> FoodData | None:
+        try:
+            food = Food.objects.get(id=food_id)
+        except Food.DoesNotExist:
+            return None
+        return self._to_data(food)
+
+    def create(self, name: str, category: str) -> FoodData:
+        food = Food.objects.create(name=name, category=category)
+        return self._to_data(food)
+
+    def update(self, food_id: int, name: str, category: str) -> FoodData | None:
+        try:
+            food = Food.objects.get(id=food_id)
+        except Food.DoesNotExist:
+            return None
+        food.name = name
+        food.category = category
+        food.save()
+        return self._to_data(food)
+
+    def delete(self, food_id: int) -> bool:
+        deleted_count, _ = Food.objects.filter(id=food_id).delete()
+        return deleted_count > 0
+
+    def _to_data(self, food: Food) -> FoodData:
+        return FoodData(
+            id=food.id,
+            name=food.name,
+            category=food.category,
+            created_at=food.created_at,
+        )
+
+
 class MealSuggestionRepository:
     def list(
         self,
