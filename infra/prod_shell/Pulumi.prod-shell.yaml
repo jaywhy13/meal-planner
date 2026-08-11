@@ -1,0 +1,5 @@
+config:
+  aws:region: us-east-1
+  meal-planner-prod-shell:vpc_id: vpc-52d59c37
+  meal-planner-prod-shell:subnet_id: subnet-74f4565f
+  meal-planner-prod-shell:aws_account_id: "879100528238"

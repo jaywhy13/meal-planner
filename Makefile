@@ -33,3 +33,17 @@ lambda-run-local:
 
 lambda-ssh:
 	docker run -it -v $(PWD)/backend:/var/task --entrypoint sh meal-planner-local
+
+# ── Production shell (infrastructure only) ───────────────────────────────────
+
+PROD_SHELL_STACK = prod-shell
+PROD_SHELL_DIR = infra/prod_shell
+
+create-prod-shell:
+	cd $(PROD_SHELL_DIR) && pulumi up --stack $(PROD_SHELL_STACK)
+
+ssh-prod-shell:
+	aws ssm start-session --target $$(cd $(PROD_SHELL_DIR) && pulumi stack output instance_id --stack $(PROD_SHELL_STACK))
+
+destroy-prod-shell:
+	cd $(PROD_SHELL_DIR) && pulumi destroy --stack $(PROD_SHELL_STACK)

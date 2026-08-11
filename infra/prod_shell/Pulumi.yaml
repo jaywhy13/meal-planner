@@ -1,0 +1,7 @@
+name: meal-planner-prod-shell
+description: Interactive shell instance for running Django management commands against production data
+runtime:
+  name: python
+  options:
+    toolchain: uv
+    virtualenv: .venv
