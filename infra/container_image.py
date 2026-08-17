@@ -1,4 +1,5 @@
 import hashlib
+import json
 import subprocess
 from pathlib import Path
 
@@ -74,6 +75,41 @@ class ContainerImage(pulumi.ComponentResource):
             opts=pulumi.ResourceOptions(parent=self, import_=config.app_name),
         )
 
+        # A container-image Lambda is pulled by the Lambda service itself, not by
+        # the function's execution role, so pull permission must be granted by the
+        # repository via a resource-based policy. Without it, restoring an Inactive
+        # function (or any cold start) fails with "does not have permission to
+        # access the specified image". The AWS console adds this automatically when
+        # wiring a container Lambda; infrastructure-as-code must declare it.
+        #
+        # The aws:sourceArn condition scopes the grant to Lambda functions in this
+        # account and region rather than the Lambda service globally.
+        aws.ecr.RepositoryPolicy(
+            "meal-planner-container-registry-lambda-pull-policy",
+            repository=self.repository.name,
+            policy=json.dumps({
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Sid": "LambdaECRImageRetrievalPolicy",
+                    "Effect": "Allow",
+                    "Principal": {"Service": "lambda.amazonaws.com"},
+                    "Action": [
+                        "ecr:BatchGetImage",
+                        "ecr:GetDownloadUrlForLayer",
+                    ],
+                    "Condition": {
+                        "StringLike": {
+                            "aws:sourceArn": (
+                                f"arn:aws:lambda:{config.aws_region}:"
+                                f"{config.aws_account_id}:function:*"
+                            ),
+                        },
+                    },
+                }],
+            }),
+            opts=pulumi.ResourceOptions(parent=self),
+        )
+
         # ECR requires a short-lived auth token to push images — it's not a static
         # username/password. get_authorization_token_output fetches a token that's
         # valid for 12 hours and provides pre-decoded username and password fields.
@@ -98,6 +134,11 @@ class ContainerImage(pulumi.ComponentResource):
                 context="../backend",
                 dockerfile="../backend/Dockerfile-lambda",
                 platform="linux/amd64",
+                # Run RUN-step networking on the host. BuildKit's default build
+                # network namespace has a failing resolver here (pypi.org returns
+                # IPv6-only records with no working route), which makes
+                # `uv pip install` fail with a DNS error. The host resolver works.
+                network="host",
                 # See _compute_backend_source_hash — feeds a content hash
                 # into a diffable input so backend/ changes trigger a rebuild.
                 args={"SOURCE_HASH": _compute_backend_source_hash()},
