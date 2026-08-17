@@ -62,7 +62,7 @@ See [docs/coding_conventions.md](docs/coding_conventions.md) for the full versio
 
 **Frontend**: React Testing Library + Jest. Test component behaviour from the user's perspective — what's rendered, what happens on click. Use factory functions (`buildDateRangeBarProps()`, `buildMeal()`) instead of shared `baseProps` objects — each call returns fresh data with independent `jest.fn()` mocks. Test files live next to the component (`MealCell.tsx` + `MealCell.test.tsx`). Prefer accessible queries (`getByRole`, `getByLabelText`, `getByText`). No snapshot tests.
 
-**End-to-end**: Playwright (TypeScript) drives a headless browser against a production-like stack (real backend + frontend + Postgres). This is a separate runner from the Jest + React Testing Library component tests above.
+**End-to-end**: Playwright (TypeScript) drives a headless browser against a production-like stack (real backend on SQLite, the React production build served by nginx). This is a separate runner from the Jest + React Testing Library component tests above.
 
 ```bash
 # Run backend tests (from backend/)

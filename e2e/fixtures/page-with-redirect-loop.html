@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page With Redirect Loop</title>
+  <script>
+    // Simulates the motivating bug: AuthProvider calling getProfile, getting a 401,
+    // and redirecting back to /login even when already on /login.
+    // Uses window.location.href so the redirect fires as a full page navigation,
+    // visible to the BrowserSession's framenavigated listener.
+    //
+    // The counter lives in sessionStorage so it persists across the reloads the
+    // loop causes — a plain variable would reset to 0 on every reload, making
+    // the safety cap dead code.
+    const REDIRECT_LOOP_STORAGE_KEY = "redirectLoopCount";
+    const MAX_REDIRECTS_BEFORE_STOPPING = 30;
+
+    function readRedirectCount() {
+      return parseInt(sessionStorage.getItem(REDIRECT_LOOP_STORAGE_KEY) ?? "0", 10);
+    }
+
+    function incrementAndStoreRedirectCount(count) {
+      sessionStorage.setItem(REDIRECT_LOOP_STORAGE_KEY, String(count + 1));
+    }
+
+    function triggerRedirect() {
+      const redirectCount = readRedirectCount();
+      if (redirectCount >= MAX_REDIRECTS_BEFORE_STOPPING) return;
+      incrementAndStoreRedirectCount(redirectCount);
+      window.location.href = window.location.href;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(triggerRedirect, 50);
+    });
+  </script>
+</head>
+<body>
+  <h1>Redirect Loop Page</h1>
+  <p>This page reloads itself to simulate a redirect loop.</p>
+</body>
+</html>
