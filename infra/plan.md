@@ -162,3 +162,15 @@ config:
 | Image built/pushed via `make` manually | `pulumi up` builds and pushes |
 | Mount path `/mnt/app` | Renamed to `/mnt/data` |
 | 3 unrelated security groups on EFS mount target | Only `storage_security_group` (Pulumi-owned) |
+
+---
+
+## `infra/admin/` — a separate Pulumi project
+
+This plan covers the always-on app stack only. `infra/admin/` is its own Pulumi
+project with its own state file — the on-demand maintenance instance used for
+production `manage.py shell` access. It reads this stack's outputs (`vpc_id`,
+`subnet_id`, `storage_security_group_id`, `file_system_id`, `access_point_id`)
+via `StackReference` and structurally cannot modify anything this stack owns.
+Neither `deploy.yml` nor `preview.yml` touch it — it's created and destroyed by
+hand via `make start-prod-instance` / `make destroy-prod-instance`.

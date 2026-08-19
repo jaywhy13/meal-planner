@@ -1,0 +1,3 @@
+config:
+  meal-planner-admin:app_stack_name: organization/meal-planner/dev
+  aws:region: us-east-1

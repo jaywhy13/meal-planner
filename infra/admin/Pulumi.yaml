@@ -1,0 +1,7 @@
+name: meal-planner-admin
+description: On-demand maintenance instance for production Django shell access
+runtime:
+  name: python
+  options:
+    toolchain: uv
+    virtualenv: .venv
