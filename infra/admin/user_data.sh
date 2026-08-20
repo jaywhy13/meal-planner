@@ -1,6 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
+# set -e means this script stops on the first failure, but the instance still
+# boots and Session Manager still connects — without this trap, a failed mount
+# or clone would leave a shell with no visible sign anything went wrong, with
+# the actual reason buried in /var/log/cloud-init-output.log.
+trap 'echo "maintenance shell setup FAILED at line $LINENO — see /var/log/cloud-init-output.log" > /etc/motd' ERR
+
 # Amazon Linux 2023 ships with the Systems Manager agent preinstalled — this
 # script only adds what's specific to a Django maintenance shell against the
 # app's EFS volume.
@@ -22,7 +28,7 @@ mkdir -p /mnt/data
 # Written to /etc/fstab (with _netdev, so it waits for networking) rather than
 # run as a one-off `mount`, so the volume remounts automatically if the
 # instance reboots mid-session instead of silently staying unmounted.
-echo '{file_system_id}:/ /mnt/data efs _netdev,tls,iam,accesspoint={access_point_id} 0 0' >> /etc/fstab
+echo '__FILE_SYSTEM_ID__:/ /mnt/data efs _netdev,tls,iam,accesspoint=__ACCESS_POINT_ID__ 0 0' >> /etc/fstab
 
 mount -a
 
@@ -51,3 +57,7 @@ echo "export DATABASE_URL=${database_url}" > /etc/profile.d/database-url.sh
 chmod 644 /etc/profile.d/database-url.sh
 echo "DATABASE_URL=${database_url}" > /opt/meal-planner/backend/.env
 chmod 644 /opt/meal-planner/backend/.env
+
+# Setup succeeded — clear the failure trap's message so a stale warning from
+# an earlier failed attempt can't outlive the problem it described.
+rm -f /etc/motd

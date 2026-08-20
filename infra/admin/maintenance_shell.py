@@ -123,10 +123,19 @@ class MaintenanceShell(pulumi.ComponentResource):
         # The access point id and file system id are only known once the app stack
         # has actually deployed (see config.py), so the template is filled in inside
         # an apply() rather than an f-string.
+        #
+        # Plain string.replace() rather than str.format(): the template is a shell
+        # script, and both str.format() and string.Template would collide with the
+        # first "${VAR}" or "{print $1}" anyone adds to it, failing pulumi up with
+        # a confusing KeyError far from the actual cause.
         user_data = pulumi.Output.all(
             file_system_id=config.file_system_id,
             access_point_id=config.access_point_id,
-        ).apply(lambda args: _USER_DATA_TEMPLATE.format(**args))
+        ).apply(
+            lambda args: _USER_DATA_TEMPLATE.replace(
+                "__FILE_SYSTEM_ID__", args["file_system_id"]
+            ).replace("__ACCESS_POINT_ID__", args["access_point_id"])
+        )
 
         self.instance = aws.ec2.Instance(
             "meal-planner-maintenance-shell-instance",
