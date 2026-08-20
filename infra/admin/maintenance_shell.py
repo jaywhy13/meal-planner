@@ -44,7 +44,7 @@ class MaintenanceShell(pulumi.ComponentResource):
         # Lets Session Manager register this instance and open a shell on it —
         # this, not a security group ingress rule, is what makes "ssh" possible.
         aws.iam.RolePolicyAttachment(
-            "meal-planner-maintenance-shell-ssm-policy",
+            "meal-planner-maintenance-shell-systems-manager-policy",
             role=self.role.name,
             policy_arn="arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
             opts=pulumi.ResourceOptions(parent=self),
@@ -82,7 +82,7 @@ class MaintenanceShell(pulumi.ComponentResource):
         # HTTPS endpoints are reachable directly — no VPC endpoint needed, matching
         # the cost trade-off networking.py already made for the web server.
         aws.ec2.SecurityGroupRule(
-            "meal-planner-maintenance-shell-ssm-egress",
+            "meal-planner-maintenance-shell-systems-manager-egress",
             type="egress",
             from_port=443,
             to_port=443,

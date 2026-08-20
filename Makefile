@@ -39,9 +39,12 @@ lambda-ssh:
 # ssh-prod-instance opens a Systems Manager Session Manager session, not literal
 # SSH — kept the familiar name, but there is no key pair and no inbound rule to
 # connect over.
+# Requires `pulumi login s3://meal-planner-pulumi-state` and PULUMI_CONFIG_PASSPHRASE
+# set beforehand — infra/admin/ has no CI, so these targets assume a human is
+# already authenticated to both AWS and the Pulumi state backend.
 
 start-prod-instance:
-	cd infra/admin && pulumi up -s prod-admin
+	cd infra/admin && pulumi stack select prod-admin --create && pulumi up -s prod-admin
 
 ssh-prod-instance:
 	aws ssm start-session --target $$(cd infra/admin && pulumi stack output instance_id -s prod-admin)
