@@ -1,3 +1,4 @@
+encryptionsalt: v1:nYF8pywq2UY=:v1:NWdsBBrFHQs4BTfB:UyrLXEgqd/7NpZ1gaGCVDjNpS87bCA==
 config:
   meal-planner-admin:app_stack_name: organization/meal-planner/dev
   aws:region: us-east-1

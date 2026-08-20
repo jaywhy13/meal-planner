@@ -41,10 +41,10 @@ lambda-ssh:
 # connect over.
 
 start-prod-instance:
-	cd infra/admin && pulumi up
+	cd infra/admin && pulumi up -s prod-admin
 
 ssh-prod-instance:
-	aws ssm start-session --target $$(cd infra/admin && pulumi stack output instance_id)
+	aws ssm start-session --target $$(cd infra/admin && pulumi stack output instance_id -s prod-admin)
 
 destroy-prod-instance:
-	cd infra/admin && pulumi destroy
+	cd infra/admin && pulumi destroy -s prod-admin
