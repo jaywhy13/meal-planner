@@ -13,7 +13,7 @@ import type {
 
 export interface CreateMealPlanInput {
   name: string;
-  start_date?: string;
+  start_date: string;
 }
 
 export type UpdateMealPlanInput = Partial<CreateMealPlanInput>;

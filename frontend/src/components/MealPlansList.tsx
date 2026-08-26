@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import { AxiosError } from 'axios';
+import dayjs from 'dayjs';
 import {
   Box,
   Typography,
@@ -30,6 +31,9 @@ const MealPlansList = (): React.ReactElement => {
   const [error, setError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [newMealPlanName, setNewMealPlanName] = useState<string>('');
+  const [newMealPlanStartDate, setNewMealPlanStartDate] = useState<string>(
+    dayjs().format('YYYY-MM-DD')
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,11 +65,16 @@ const MealPlansList = (): React.ReactElement => {
 
   const handleCreateMealPlan = async (): Promise<void> => {
     if (!newMealPlanName.trim()) return;
+    if (!newMealPlanStartDate || !dayjs(newMealPlanStartDate).isValid()) return;
 
     try {
-      const response = await mealPlansAPI.create({ name: newMealPlanName });
+      const response = await mealPlansAPI.create({
+        name: newMealPlanName,
+        start_date: newMealPlanStartDate,
+      });
       setMealPlans([...mealPlans, response.data]);
       setNewMealPlanName('');
+      setNewMealPlanStartDate(dayjs().format('YYYY-MM-DD'));
       setOpenDialog(false);
     } catch (caughtError) {
       setError('Failed to create meal plan');
@@ -161,6 +170,18 @@ const MealPlansList = (): React.ReactElement => {
             onKeyPress={(event: KeyboardEvent<HTMLDivElement>) => {
               if (event.key === 'Enter') handleCreateMealPlan();
             }}
+          />
+          <TextField
+            margin="dense"
+            label="Start Date"
+            type="date"
+            fullWidth
+            variant="outlined"
+            value={newMealPlanStartDate}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              setNewMealPlanStartDate(event.target.value)
+            }
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
