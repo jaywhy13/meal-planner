@@ -94,6 +94,19 @@ class GenerateMealPlanTests(APITestCase):
         self.assertEqual(reused_meal.name, "Oatmeal")
         self.assertEqual(reused_meal.user, user)
 
+    def test_generated_daily_meals_are_owned_by_the_meal_plan_owner(self):
+        user = UserFactory()
+        self.client.force_authenticate(user=user)
+        plan = MealPlanFactory(user=user, start_date=datetime.date(2026, 5, 1))
+
+        response = self.client.post(self._generate_url(plan), {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        generated_daily_meals = DailyMeal.objects.filter(meal_plan=plan)
+        self.assertTrue(generated_daily_meals.exists())
+        distinct_users = set(generated_daily_meals.values_list("user_id", flat=True))
+        self.assertEqual(distinct_users, {user.id})
+
     def test_generated_meal_carries_suggestion_foods_and_notes(self):
         user = UserFactory()
         self.client.force_authenticate(user=user)

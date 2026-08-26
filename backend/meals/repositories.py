@@ -144,6 +144,7 @@ class DailyMealRepository:
         meal_type: str,
     ) -> tuple[DailyMeal, bool]:
         return DailyMeal.objects.get_or_create(
+            user=meal_plan.user,
             meal_plan=meal_plan,
             date=meal_date,
             meal_type=meal_type,

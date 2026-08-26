@@ -152,7 +152,7 @@ class DailyMealViewSet(viewsets.ModelViewSet):
         meal_plan = serializer.validated_data.get("meal_plan")
         if meal_plan and meal_plan.user != self.request.user:
             raise PermissionDenied("You do not own this meal plan.")
-        serializer.save()
+        serializer.save(user=self.request.user)
 
 
 class MealSuggestionViewSet(viewsets.ViewSet):

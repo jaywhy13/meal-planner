@@ -61,6 +61,7 @@ class DailyMealFactory(factory.django.DjangoModelFactory):
         model = DailyMeal
 
     meal_plan = factory.SubFactory(MealPlanFactory)
+    user = factory.SelfAttribute("meal_plan.user")
     date = datetime.date(2026, 5, 4)
     meal_type = MealType.BREAKFAST
 

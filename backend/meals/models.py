@@ -56,6 +56,7 @@ class Meal(models.Model):
 class DailyMeal(models.Model):
     """Represents a meal slot for a specific calendar date in a meal plan"""
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="daily_meals")
     meal_plan = models.ForeignKey(MealPlan, on_delete=models.CASCADE, related_name="daily_meals")
     date = models.DateField()
     day_of_week = models.PositiveSmallIntegerField(db_index=True)  # ISO weekday: 1=Mon, 7=Sun
@@ -63,7 +64,7 @@ class DailyMeal(models.Model):
     meal = models.ForeignKey(Meal, on_delete=models.SET_NULL, null=True, blank=True, related_name="daily_meals")
 
     class Meta:
-        unique_together = ["meal_plan", "date", "meal_type"]
+        unique_together = ["user", "meal_plan", "date", "meal_type"]
         ordering = ["date", "meal_type"]
 
     def save(self, *args, **kwargs):

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from .models import MealPlan, Food, DailyMeal, Meal, MealSettings
 
 
@@ -61,6 +62,19 @@ class DailyMealSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyMeal
         fields = ["id", "meal_plan", "date", "day_of_week", "meal_type", "meal", "meal_id"]
+        # `user` is deliberately absent from `fields` above so it can never be
+        # client-set. DRF's ModelSerializer only auto-derives a unique-together
+        # validator when every constrained field is exposed, so widening
+        # DailyMeal.Meta.unique_together to include `user` silently dropped
+        # this validator. Restoring it against (meal_plan, date, meal_type)
+        # is not a loosening: meal_plan already determines the owner via
+        # MealPlan.user, so the two field sets select the same rows.
+        validators = [
+            UniqueTogetherValidator(
+                queryset=DailyMeal.objects.all(),
+                fields=["meal_plan", "date", "meal_type"],
+            )
+        ]
 
 
 class MealSettingsSerializer(serializers.ModelSerializer):

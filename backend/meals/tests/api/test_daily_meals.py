@@ -85,6 +85,102 @@ class DailyMealMealLinkTests(APITestCase):
         self.assertEqual(created_daily_meal.meal, meal)
 
 
+class DailyMealUserAssociationTests(APITestCase):
+    def test_create_persists_daily_meal_owned_by_requesting_user(self):
+        user = UserFactory()
+        self.client.force_authenticate(user=user)
+        plan = MealPlanFactory(user=user)
+        daily_meal_list_url = reverse("dailymeal-list")
+
+        response = self.client.post(
+            daily_meal_list_url,
+            {"meal_plan": plan.id, "date": "2026-05-04", "meal_type": MealType.BREAKFAST},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        created_daily_meal = DailyMeal.objects.get(pk=response.data["id"])
+        self.assertEqual(created_daily_meal.user, user)
+
+    def test_create_ignores_client_supplied_user(self):
+        user = UserFactory()
+        other_user = UserFactory()
+        self.client.force_authenticate(user=user)
+        plan = MealPlanFactory(user=user)
+        daily_meal_list_url = reverse("dailymeal-list")
+
+        response = self.client.post(
+            daily_meal_list_url,
+            {
+                "meal_plan": plan.id,
+                "date": "2026-05-04",
+                "meal_type": MealType.BREAKFAST,
+                "user": other_user.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        created_daily_meal = DailyMeal.objects.get(pk=response.data["id"])
+        self.assertEqual(created_daily_meal.user, user)
+
+    def test_two_users_can_each_own_a_daily_meal_for_same_date_and_meal_type(self):
+        first_user = UserFactory()
+        second_user = UserFactory()
+        first_plan = MealPlanFactory(user=first_user)
+        second_plan = MealPlanFactory(user=second_user)
+
+        first_daily_meal = DailyMealFactory(
+            meal_plan=first_plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST
+        )
+        second_daily_meal = DailyMealFactory(
+            meal_plan=second_plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST
+        )
+
+        self.assertEqual(first_daily_meal.user, first_user)
+        self.assertEqual(second_daily_meal.user, second_user)
+
+
+class DailyMealUniqueSlotValidationTests(APITestCase):
+    def test_duplicate_slot_post_returns_400(self):
+        user = UserFactory()
+        self.client.force_authenticate(user=user)
+        plan = MealPlanFactory(user=user)
+        DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST)
+        daily_meal_list_url = reverse("dailymeal-list")
+
+        response = self.client.post(
+            daily_meal_list_url,
+            {"meal_plan": plan.id, "date": "2026-05-04", "meal_type": MealType.BREAKFAST},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_put_update_does_not_trip_unique_validator_against_its_own_row(self):
+        user = UserFactory()
+        self.client.force_authenticate(user=user)
+        meal = MealFactory(user=user, name="Dinner")
+        plan = MealPlanFactory(user=user)
+        daily_meal = DailyMealFactory(meal_plan=plan, date=datetime.date(2026, 5, 4), meal_type=MealType.BREAKFAST)
+        daily_meal_detail_url = reverse("dailymeal-detail", args=[daily_meal.pk])
+
+        response = self.client.put(
+            daily_meal_detail_url,
+            {
+                "meal_plan": plan.id,
+                "date": "2026-05-04",
+                "meal_type": MealType.BREAKFAST,
+                "meal_id": meal.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        daily_meal.refresh_from_db()
+        self.assertEqual(daily_meal.meal, meal)
+
+
 class MealSettingsDayToggleTests(APITestCase):
     def test_day_toggles_in_api_response(self):
         user = UserFactory()
