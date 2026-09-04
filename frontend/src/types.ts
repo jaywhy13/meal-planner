@@ -28,10 +28,8 @@ export interface Meal {
 export interface DailyMeal {
   id: number;
   meal_plan: number;
-  date?: string;
-  day_of_week?: number;
-  week?: number;
-  day?: number;
+  date: string;
+  day_of_week: number;
   meal_type: MealType;
   meal: Meal | null;
 }
