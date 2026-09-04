@@ -228,6 +228,7 @@ const FoodsManagement = (): React.ReactElement => {
               }
               fullWidth
               SelectProps={{ native: true }}
+              InputLabelProps={{ shrink: true }}
             >
               <option value="">Select a category...</option>
               {FOOD_CATEGORIES.map((category) => (
