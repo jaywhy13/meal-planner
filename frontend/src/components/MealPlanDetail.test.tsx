@@ -153,3 +153,15 @@ describe('MealPlanDetail week grid', () => {
     expect(screen.queryByText('Porridge')).not.toBeInTheDocument();
   });
 });
+
+describe('MealPlanDetail new food category select', () => {
+  it('shrinks the Category label so it does not sit on top of the placeholder option', async () => {
+    renderMealPlanDetail();
+
+    fireEvent.click(await screen.findByRole('button', { name: /add meal/i }));
+
+    expect(await screen.findByText('Category', { selector: 'label' })).toHaveClass(
+      'MuiInputLabel-shrink'
+    );
+  });
+});

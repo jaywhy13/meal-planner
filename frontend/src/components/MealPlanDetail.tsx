@@ -441,6 +441,7 @@ const MealPlanDetail = (): React.ReactElement => {
                   size="small"
                   sx={{ minWidth: 130 }}
                   SelectProps={{ native: true }}
+                  InputLabelProps={{ shrink: true }}
                 >
                   <option value="">Select...</option>
                   {FOOD_CATEGORIES.map((category) => (
