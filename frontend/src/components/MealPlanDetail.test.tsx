@@ -1,8 +1,11 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import dayjs from 'dayjs';
 import MealPlanDetail from './MealPlanDetail';
 import { mealPlansAPI, foodsAPI, dailyMealsAPI, mealsAPI, mealSettingsAPI } from '../services/api';
-import type { Food, Meal, MealPlan } from '../types';
+import type { DailyMeal, Food, Meal, MealPlan } from '../types';
+
+const planStartMonday = dayjs().startOf('week').add(1, 'day');
 
 jest.mock('../services/api');
 
@@ -36,11 +39,21 @@ const buildMeal = (overrides: Partial<Meal> = {}): Meal => ({
 const buildMealPlan = (overrides: Partial<MealPlan> = {}): MealPlan => ({
   id: 5,
   name: 'May Plan',
-  start_date: '2026-05-01',
-  created_at: '2026-05-01T00:00:00Z',
-  updated_at: '2026-05-01T00:00:00Z',
+  start_date: planStartMonday.format('YYYY-MM-DD'),
+  created_at: planStartMonday.toISOString(),
+  updated_at: planStartMonday.toISOString(),
   daily_meals: [],
   meal_settings: null,
+  ...overrides,
+});
+
+const buildDailyMeal = (overrides: Partial<DailyMeal> = {}): DailyMeal => ({
+  id: 100,
+  meal_plan: 5,
+  date: planStartMonday.format('YYYY-MM-DD'),
+  day_of_week: 1,
+  meal_type: 'breakfast',
+  meal: buildMeal({ id: 20, name: 'Porridge', foods: [buildFood({ id: 2, name: 'Porridge' })] }),
   ...overrides,
 });
 
@@ -101,5 +114,42 @@ describe('MealPlanDetail save flow', () => {
     expect(dailyMealPayload).not.toHaveProperty('food_ids');
     expect(dailyMealPayload).not.toHaveProperty('notes');
     expect(dailyMealPayload).toHaveProperty('date');
+  });
+});
+
+describe('MealPlanDetail week grid', () => {
+  it('renders a daily meal returned by the API in its date cell', async () => {
+    mockedDailyMealsAPI.getAll.mockResolvedValue(okResponse([buildDailyMeal()]));
+
+    renderMealPlanDetail();
+
+    expect(await screen.findByText('Porridge')).toBeInTheDocument();
+  });
+
+  it('renders a daily meal on the last day of the displayed week', async () => {
+    mockedDailyMealsAPI.getAll.mockResolvedValue(
+      okResponse([
+        buildDailyMeal({
+          date: planStartMonday.add(6, 'day').format('YYYY-MM-DD'),
+          day_of_week: 7,
+          meal_type: 'dinner',
+        }),
+      ])
+    );
+
+    renderMealPlanDetail();
+
+    expect(await screen.findByText('Porridge')).toBeInTheDocument();
+  });
+
+  it('leaves the cell empty for a daily meal outside the displayed week', async () => {
+    mockedDailyMealsAPI.getAll.mockResolvedValue(
+      okResponse([buildDailyMeal({ date: planStartMonday.add(7, 'day').format('YYYY-MM-DD') })])
+    );
+
+    renderMealPlanDetail();
+
+    await screen.findByRole('button', { name: /add meal/i });
+    expect(screen.queryByText('Porridge')).not.toBeInTheDocument();
   });
 });

@@ -76,7 +76,7 @@ const MealPlanDetail = (): React.ReactElement => {
     if (mealPlan) {
       fetchDailyMeals();
       fetchMealSettings();
-      const planMonday = dayjs(mealPlan.created_at).startOf('week').add(1, 'day');
+      const planMonday = dayjs(mealPlan.start_date).startOf('week').add(1, 'day');
       const daysSinceStart = dayjs().startOf('day').diff(planMonday, 'day');
       setCurrentWeek(Math.max(1, Math.floor(daysSinceStart / 7) + 1));
     }
@@ -121,7 +121,7 @@ const MealPlanDetail = (): React.ReactElement => {
     }
   };
 
-  const anchor = mealPlan ? dayjs(mealPlan.created_at) : dayjs();
+  const anchor = mealPlan ? dayjs(mealPlan.start_date) : dayjs();
   const week1Start = anchor.startOf('week').add(1, 'day');
   const weekStart = week1Start.add((currentWeek - 1) * 7, 'day');
   const weekEnd = weekStart.add(6, 'day');
@@ -134,11 +134,15 @@ const MealPlanDetail = (): React.ReactElement => {
       })
     : MEAL_TYPES;
 
+  const dayOffsetWithinWeek = (dailyMeal: DailyMeal): number =>
+    dayjs(dailyMeal.date).startOf('day').diff(weekStart, 'day');
+
   const mealsForCurrentWeek: WeekGridMeal[] = dailyMeals
-    .filter((dailyMeal) => dailyMeal.week === currentWeek)
-    .map((dailyMeal) => ({
+    .map((dailyMeal) => ({ dailyMeal, dayOffset: dayOffsetWithinWeek(dailyMeal) }))
+    .filter(({ dayOffset }) => dayOffset >= 0 && dayOffset < 7)
+    .map(({ dailyMeal, dayOffset }) => ({
       id: dailyMeal.id,
-      day: dailyMeal.day ?? 0,
+      day: dayOffset + 1,
       meal_type: dailyMeal.meal_type,
       foods: dailyMeal.meal?.foods ?? [],
     }));
